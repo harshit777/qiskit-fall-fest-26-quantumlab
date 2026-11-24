@@ -1,0 +1,36 @@
+{
+  "id": "entanglement",
+  "qubits": 2,
+  "gates": [["h", 0], ["cx", 0, 1]],
+  "expected": { "00": 0.5, "11": 0.5 },
+  "en": {
+    "title": "Entanglement",
+    "intro": "Two entangled qubits share one fate. This circuit makes a Bell pair: H blends qubit 0, then CX copies its choice onto qubit 1.",
+    "steps": [
+      "The bars show only 00 and 11, never 01 or 10. The two qubits always agree.",
+      "Remove the CX gate. Now the qubits are independent. Only qubit 0 is blended, so you see 00 and 01 at 50% each.",
+      "Add an H on qubit 1 too. With no CX, you get four outcomes at 25% each. That is two separate coins.",
+      "Put CX back after both H gates and watch which outcomes survive."
+    ],
+    "quiz": [
+      { "q": "In the Bell pair, which outcomes can you ever measure?", "options": ["00 and 11", "01 and 10", "All four equally"], "answer": 0, "why": "The two qubits are correlated, so they always give the same result." },
+      { "q": "What does the CX gate need to make entanglement?", "options": ["A qubit already in superposition", "Two qubits at 0", "Nothing"], "answer": 0, "why": "If the control is a definite 0 or 1, CX only copies it. A blended control creates entanglement." },
+      { "q": "Two independent qubits both with H give how many equally likely outcomes?", "options": ["2", "4", "1"], "answer": 1, "why": "Each qubit gives 2 results independently, so 2 × 2 = 4 outcomes at 25% each." }
+    ]
+  },
+  "hi": {
+    "title": "एंटैंगलमेंट",
+    "intro": "दो एंटैंगल्ड क्यूबिट्स की किस्मत जुड़ी होती है। यह सर्किट बेल जोड़ी बनाता है: H क्यूबिट 0 को मिश्रित करता है, फिर CX उसका नतीजा क्यूबिट 1 पर नकल कर देता है।",
+    "steps": [
+      "बार सिर्फ़ 00 और 11 दिखाते हैं, 01 या 10 कभी नहीं। दोनों क्यूबिट हमेशा एक जैसे निकलते हैं।",
+      "CX गेट हटाइए। अब क्यूबिट स्वतंत्र हैं: सिर्फ़ क्यूबिट 0 मिश्रित है, इसलिए 00 और 01 में से हर एक 50% दिखेगा।",
+      "क्यूबिट 1 पर भी H जोड़िए। CX के बिना चारों नतीजे 25%-25% आते हैं। यानी दो अलग सिक्के।",
+      "दोनों H के बाद CX वापस लगाइए और देखिए कौन से नतीजे बचते हैं।"
+    ],
+    "quiz": [
+      { "q": "बेल जोड़ी में कौन से नतीजे कभी मिल सकते हैं?", "options": ["00 और 11", "01 और 10", "चारों बराबर"], "answer": 0, "why": "दोनों क्यूबिट आपस में जुड़े हैं, इसलिए हमेशा एक जैसा नतीजा देते हैं।" },
+      { "q": "एंटैंगलमेंट बनाने के लिए CX गेट को क्या चाहिए?", "options": ["पहले से सुपरपोज़िशन में एक क्यूबिट", "0 पर दो क्यूबिट", "कुछ नहीं"], "answer": 0, "why": "अगर कंट्रोल पक्का 0 या 1 है तो CX सिर्फ़ नकल करता है। मिश्रित कंट्रोल से एंटैंगलमेंट बनता है।" },
+      { "q": "दो स्वतंत्र क्यूबिट्स दोनों पर H लगाने से कितने बराबर संभावना वाले नतीजे मिलते हैं?", "options": ["2", "4", "1"], "answer": 1, "why": "हर क्यूबिट अलग से 2 नतीजे देता है, इसलिए 2 × 2 = 4 नतीजे, हर एक 25%।" }
+    ]
+  }
+}

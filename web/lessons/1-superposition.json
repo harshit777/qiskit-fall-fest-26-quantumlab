@@ -1,0 +1,36 @@
+{
+  "id": "superposition",
+  "qubits": 1,
+  "gates": [["h", 0]],
+  "expected": { "0": 0.5, "1": 0.5 },
+  "en": {
+    "title": "Superposition",
+    "intro": "A bit is 0 or 1. A qubit can be a blend of both until you measure it. The H (Hadamard) gate creates an equal blend.",
+    "steps": [
+      "Look at the circuit: one qubit, one H gate. The bars show a 50% chance of 0 and 50% of 1.",
+      "Click the H gate to remove it. The qubit stays 0, so the bar for 0 goes to 100%.",
+      "Add an X gate. X flips 0 to 1. Now 1 is 100%.",
+      "Add H, then H again. Two Hadamards cancel out. Surprise: you are back to a certain result."
+    ],
+    "quiz": [
+      { "q": "What does the H gate do to a qubit that starts at 0?", "options": ["Flips it to 1", "Makes an equal 0/1 blend", "Nothing"], "answer": 1, "why": "H turns a definite 0 into a 50/50 superposition of 0 and 1." },
+      { "q": "You apply H twice in a row. What do you measure?", "options": ["Always 0", "50% 0, 50% 1", "Always 1"], "answer": 0, "why": "The second H undoes the first, so the qubit returns to 0." },
+      { "q": "What does the X gate do to 0?", "options": ["Makes it 1", "Makes a blend", "Nothing"], "answer": 0, "why": "X is the quantum NOT gate: 0 becomes 1 and 1 becomes 0." }
+    ]
+  },
+  "hi": {
+    "title": "सुपरपोज़िशन",
+    "intro": "एक बिट 0 या 1 होता है। एक क्यूबिट मापे जाने तक दोनों का मिश्रण हो सकता है। H (हैडमार्ड) गेट बराबर मिश्रण बनाता है।",
+    "steps": [
+      "सर्किट देखिए: एक क्यूबिट और एक H गेट। बार दिखाते हैं कि 0 आने की संभावना 50% और 1 की 50% है।",
+      "H गेट पर क्लिक करके उसे हटाइए। क्यूबिट 0 ही रहता है, इसलिए 0 का बार 100% हो जाता है।",
+      "X गेट जोड़िए। X, 0 को 1 में पलट देता है। अब 1 की संभावना 100% है।",
+      "H जोड़िए, फिर दोबारा H। दो हैडमार्ड एक-दूसरे को काट देते हैं। नतीजा फिर से पक्का हो जाता है।"
+    ],
+    "quiz": [
+      { "q": "0 से शुरू होने वाले क्यूबिट पर H गेट क्या करता है?", "options": ["उसे 1 कर देता है", "0 और 1 का बराबर मिश्रण बनाता है", "कुछ नहीं"], "answer": 1, "why": "H एक पक्के 0 को 0 और 1 के 50/50 सुपरपोज़िशन में बदल देता है।" },
+      { "q": "आप लगातार दो बार H लगाते हैं। माप में क्या मिलेगा?", "options": ["हमेशा 0", "50% 0, 50% 1", "हमेशा 1"], "answer": 0, "why": "दूसरा H पहले को पलट देता है, इसलिए क्यूबिट वापस 0 हो जाता है।" },
+      { "q": "X गेट 0 के साथ क्या करता है?", "options": ["उसे 1 बना देता है", "मिश्रण बनाता है", "कुछ नहीं"], "answer": 0, "why": "X क्वांटम NOT गेट है: 0 से 1 और 1 से 0।" }
+    ]
+  }
+}

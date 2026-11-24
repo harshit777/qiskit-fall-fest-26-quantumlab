@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+@import 'tailwindcss';
+
+/* Same palette as susinbinary.com: white surface, slate ink, orange signal */
+@theme inline {
+  --font-sans: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+  --font-heading: 'Space Grotesk', 'Noto Sans Devanagari', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --color-accent: #c2410c;
+  --color-border: #dde3ec;
+  --color-surface: #f8f9fb;
+}
+
+body {
+  background: #fff;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid #c2410c; outline-offset: 2px; }

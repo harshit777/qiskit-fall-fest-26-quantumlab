@@ -146,3 +146,16 @@ Out of scope until the deadline has passed. First step: deploy QuantumLab at `qu
 3. 1:30 **Under the hood:** the architecture slide, Qiskit parity test, real-hardware vs noise-model table
 4. 2:15 **Evidence:** pre/post learner scores (n≥3)
 5. 2:40 **Honest limits + next steps**, and who benefits (teachers, regional-language students)
+
+## 12. How the hackathon app and susinbinary.com combine
+
+Decision: **two repos, one brand.** QuantumLab is a standalone app that uses the same look as the site (white surface, slate ink, orange accent `#c2410c`, `01 SusinBinary` wordmark, mono `./nav` links), so it already feels like a tab of the site.
+
+| Step | When | What |
+| --- | --- | --- |
+| 1. Deploy | Wed 25 Nov | Deploy `web/` on Vercel (root directory `web`). Use the free `*.vercel.app` URL first |
+| 2. Link both ways | Thu 26 Nov, after the deploy works | The QuantumLab header already links back to susinbinary.com. In the website repo, add one `./quantum` link in `components/site-header.tsx` pointing at the deployed URL |
+| 3. Own domain | After submission | Point `quantum.susinbinary.com` (CNAME) at the Vercel project |
+| 4. Revamp | After submission | Move toward the quantum-only site: reuse `web/components/lab.tsx` pieces in the main site, or make QuantumLab the home page |
+
+Do **not** add the link to the production site until the URL is live and the demo is stable.

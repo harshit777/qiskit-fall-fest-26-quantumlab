@@ -1,0 +1,36 @@
+{
+  "id": "grover",
+  "qubits": 2,
+  "gates": [["h", 0], ["h", 1], ["cz", 0, 1], ["h", 0], ["h", 1], ["z", 0], ["z", 1], ["cz", 0, 1], ["h", 0], ["h", 1]],
+  "expected": { "11": 1 },
+  "en": {
+    "title": "Grover search",
+    "intro": "Find one marked item among four. Here the marked item is 11. The CZ gate marks it, and the H, Z, CZ, H steps boost its chance until it is certain after one round.",
+    "steps": [
+      "The two H gates at the start give all four items an equal 25% chance.",
+      "The first CZ marks the answer 11 by flipping its sign. Probabilities do not change yet.",
+      "The next H, Z, CZ, H block amplifies the marked item. Look at the bars: 11 is now 100%.",
+      "Remove the last CZ or last H gates and watch the answer fade. Each gate matters."
+    ],
+    "quiz": [
+      { "q": "What is Grover search used for?", "options": ["Finding a marked item in an unsorted list", "Sorting a list", "Encrypting data"], "answer": 0, "why": "Grover finds a marked item among N using about √N steps instead of about N." },
+      { "q": "With 4 items, how many Grover rounds make the answer certain?", "options": ["1", "2", "4"], "answer": 0, "why": "For N = 4 one round gives the marked item with 100% probability." },
+      { "q": "Does this 4-item demo show a real quantum speedup?", "options": ["Yes, huge", "No, it is too small to matter", "It is slower than any computer"], "answer": 1, "why": "Four items is trivial for a classical computer. The advantage only grows for large lists and still needs far better hardware." }
+    ]
+  },
+  "hi": {
+    "title": "ग्रोवर सर्च",
+    "intro": "चार चीज़ों में से एक चिह्नित चीज़ ढूँढिए। यहाँ चिह्नित चीज़ 11 है। CZ गेट उसे चिह्नित करता है, और H, Z, CZ, H के चरण उसकी संभावना तब तक बढ़ाते हैं जब तक वह एक राउंड के बाद पक्की नहीं हो जाती।",
+    "steps": [
+      "शुरुआत के दो H गेट चारों चीज़ों को बराबर 25% संभावना देते हैं।",
+      "पहला CZ जवाब 11 का चिह्न पलटकर उसे चिह्नित करता है। संभावनाएँ अभी नहीं बदलतीं।",
+      "अगला H, Z, CZ, H ब्लॉक चिह्नित चीज़ को बढ़ाता है। बार देखिए: 11 अब 100% है।",
+      "आख़िरी CZ या आख़िरी H गेट हटाइए और देखिए जवाब कैसे घटता है। हर गेट मायने रखता है।"
+    ],
+    "quiz": [
+      { "q": "ग्रोवर सर्च किसलिए इस्तेमाल होता है?", "options": ["बिना क्रम की सूची में चिह्नित चीज़ ढूँढने के लिए", "सूची को क्रम में लगाने के लिए", "डेटा एन्क्रिप्ट करने के लिए"], "answer": 0, "why": "ग्रोवर N चीज़ों में से चिह्नित चीज़ को लगभग N की जगह √N चरणों में ढूँढ लेता है।" },
+      { "q": "4 चीज़ों के लिए जवाब पक्का करने में कितने ग्रोवर राउंड लगते हैं?", "options": ["1", "2", "4"], "answer": 0, "why": "N = 4 के लिए एक राउंड चिह्नित चीज़ को 100% संभावना के साथ देता है।" },
+      { "q": "क्या यह 4 चीज़ों वाला डेमो असली क्वांटम स्पीडअप दिखाता है?", "options": ["हाँ, बहुत बड़ा", "नहीं, यह बहुत छोटा है", "यह किसी भी कंप्यूटर से धीमा है"], "answer": 1, "why": "चार चीज़ें क्लासिकल कंप्यूटर के लिए आसान हैं। फ़ायदा बड़ी सूचियों में ही बढ़ता है और उसके लिए कहीं बेहतर हार्डवेयर चाहिए।" }
+    ]
+  }
+}
