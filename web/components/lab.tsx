@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { LESSONS, type Lang } from '@/lib/lessons'
 import { probabilities, type Gate } from '@/lib/sim'
+import { Header } from '@/components/header'
 
 const UI = {
   en: { lessons: 'Lessons', circuit: 'Circuit', add: 'Add gate to qubit', reset: 'Reset to lesson', remove: 'Click a gate to remove it', hist: 'Measurement probabilities', walk: 'Try this', quiz: 'Quiz', score: 'Score', nogates: 'No gates: the qubits stay at 0.', site: 'Back to susinbinary.com', tag: 'Quantum learning for every student, with no hardware and no heavy math.' },
@@ -34,13 +35,9 @@ export function Lab() {
 
   return (
     <div lang={lang}>
-      <header className="sticky top-0 z-10 border-b border-border bg-white">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-          <a href="https://susinbinary.com" className="flex items-center gap-2.5">
-            <span className="flex size-8 items-center justify-center rounded-md bg-slate-900 font-mono text-[11px] font-bold text-white">01</span>
-            <span className="font-mono text-[15px] font-bold tracking-tight">SusinBinary</span>
-            <span className="font-mono text-[12px] text-slate-500">/ ./quantum</span>
-          </a>
+      <Header
+        active="/"
+        right={
           <div role="group" aria-label="Language" className="flex gap-1 font-mono text-[12px]">
             {(['en', 'hi'] as const).map((l) => (
               <button
@@ -53,8 +50,8 @@ export function Lab() {
               </button>
             ))}
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         <p className="font-mono text-[12px] text-accent">QFF 2026 · Education · Team SusInBinary</p>
