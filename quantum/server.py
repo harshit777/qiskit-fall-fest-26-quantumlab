@@ -25,7 +25,7 @@ def hardware_enabled():
 
 def work(job, p, hw):
     try:
-        pipeline.run(p["code"], p["level"], p["shots"], p["backend"], job["stages"].append, lambda s: job.update(status=s))
+        pipeline.run(p["code"], p["level"], p["shots"], p["backend"], job["stages"].append, lambda s: job.update(phase=s))
         job["status"] = "done"
     except Exception as e:
         msg = str(e) if isinstance(e, SandboxError) else f"{type(e).__name__}: {e}"
@@ -72,7 +72,7 @@ class Handler(BaseHTTPRequestHandler):
         if hw and not HW.acquire(blocking=False):
             return self.send(429, {"error": "a hardware job is already running, try again in a few minutes"})
         jid = uuid.uuid4().hex[:12]
-        JOBS[jid] = job = {"status": "running", "stages": [], "error": None, "hardware": hw}
+        JOBS[jid] = job = {"status": "running", "phase": None, "stages": [], "error": None, "hardware": hw}
         while len(JOBS) > MAX_JOBS:
             JOBS.pop(next(iter(JOBS)))
         threading.Thread(target=work, args=(job, p, hw), daemon=True).start()

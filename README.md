@@ -8,7 +8,7 @@ QFF 2026 · Track: Education · Case Study 3 · Team: **SusInBinary**
 Quantum education is mostly English, math-heavy and tied to expensive hardware. Learners in many regions and languages are left out.
 
 ## Approach
-QuantumLab teaches three core ideas as guided lessons with quizzes, in **English and Hindi**:
+QuantumLab teaches three core ideas as guided lessons with quizzes, in **English, Hindi (हिन्दी) and Kannada (ಕನ್ನಡ)**:
 
 1. **Superposition** (H gate)
 2. **Entanglement** (Bell pair: H + CX)
@@ -82,7 +82,7 @@ TODO: hardware vs noise-model counts, transpiled depth (`results/`), classical b
 ## Limitations and next steps
 - The browser simulator is exact and noiseless, and supports up to a few qubits with real amplitudes only (H, X, Z, CX, CZ).
 - Grover with 4 items shows the idea, not a speedup. We claim no quantum advantage.
-- Hindi text needs review by more native speakers. More languages are just more JSON.
+- Hindi and Kannada text needs review by native speakers before the final submission. The whole UI (both tabs, every lifecycle stage and every server message) is translated, but the Qiskit code in the editor stays in English because it is Python. More languages are one dictionary in `web/lib/dicts.ts` plus one block per lesson JSON; `npm test` fails if any key or lesson is missing a language.
 
 ## Credits
 Qiskit, Qiskit Aer, Qiskit IBM Runtime, Next.js, Tailwind CSS. The look follows [susinbinary.com](https://susinbinary.com). Day 1/Day 2 workshop notebooks from QFF 2026 informed the circuits but are not part of this repo.

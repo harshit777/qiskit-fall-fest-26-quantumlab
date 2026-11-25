@@ -1,6 +1,8 @@
 """The Qiskit circuit lifecycle, one stage at a time:
 build & compose -> decompose -> optimize -> transpile -> execute -> post-process.
-Each stage is emitted as a JSON-able dict so the web UI can show it as soon as it is done."""
+Each stage is emitted as a JSON-able dict so the web UI can show it as soon as it is done.
+Text is language-neutral: stages carry ids, params and {"k": key, "v": value} chips/notes that the web UI
+translates (en/hi/kn). The English `title`/`why` fields are kept as a fallback for other clients."""
 import os
 
 from qiskit import QuantumCircuit, transpile
@@ -46,8 +48,8 @@ def run(code, level, shots, kind, emit, status):
         "id": "build", "title": "1 · Build & compose",
         "why": "Your code becomes a QuantumCircuit. compose() and append() nest smaller circuits inside bigger ones, so you can build once and reuse.",
         "stats": stats(qc), "diagrams": [{"label": "qc", "text": draw(qc)}],
-        "chips": [f"sub-circuit: {c}" for c in composites],
-        "note": "No measurement found, so qc.measure_all() was added to read results." if auto else None,
+        "chips": [{"k": "sub", "v": c} for c in composites],
+        "note": {"k": "autoMeasure"} if auto else None,
     })
 
     # 2. Decompose: expand sub-circuits into the gates they are made of
@@ -59,7 +61,7 @@ def run(code, level, shots, kind, emit, status):
         "id": "decompose", "title": "2 · Decompose",
         "why": "decompose() opens composite gates one level at a time. Optimizers and hardware only understand simple gates, so everything is unrolled before it runs.",
         "stats": stats(full), "diagrams": diagrams,
-        "note": None if composites else "This circuit has no sub-circuits, so decomposing changes nothing. Try qc.append(bell.to_gate(), [0, 1]).",
+        "note": None if composites else {"k": "noSub"},
     })
 
     # 3. Optimize: gate-level simplification only (no device yet), compared across levels 0-3
@@ -75,7 +77,7 @@ def run(code, level, shots, kind, emit, status):
     })
 
     # 4. Transpile: map the circuit onto a concrete device
-    status("connecting to IBM Quantum..." if kind == "ibm" else "transpiling...")
+    status({"k": "connect"} if kind == "ibm" else {"k": "transpiling"})
     if kind == "ibm":
         from qiskit_ibm_runtime import QiskitRuntimeService
         svc = QiskitRuntimeService(channel="ibm_quantum_platform", token=os.environ["QUANTUM_API_KEY"])
@@ -85,16 +87,16 @@ def run(code, level, shots, kind, emit, status):
     pm = generate_preset_pass_manager(backend=backend, optimization_level=level, seed_transpiler=SEED)
     isa = pm.run(qc)
     try:
-        layout = f"virtual qubit -> physical qubit: {isa.layout.final_index_layout()}"
+        layout = str(isa.layout.final_index_layout())
     except Exception:
         layout = None
     before, after = stats(qc), stats(isa)
     emit({
-        "id": "transpile", "title": f"4 · Transpile (level {level}) for {backend.name}",
+        "id": "transpile", "title": f"4 · Transpile (level {level}) for {backend.name}", "p": {"level": level, "backend": backend.name},
         "why": "The device only has certain gates and only some qubits are connected. Transpiling picks a layout, inserts swaps to route two-qubit gates, and translates everything to native gates.",
         "stats": after, "diagrams": [{"label": "ISA circuit (what the device runs)", "text": draw(isa)}],
-        "chips": ["pass stages: " + " > ".join(pm.stages)] + ([layout] if layout else []),
-        "note": f"depth {before['depth']} -> {after['depth']}, gates {before['size']} -> {after['size']}, 2-qubit gates {before['twoq']} -> {after['twoq']}",
+        "chips": [{"k": "stages", "v": " > ".join(pm.stages)}] + ([{"k": "layout", "v": layout}] if layout else []),
+        "note": {"k": "delta", "v": {"d0": before["depth"], "d1": after["depth"], "s0": before["size"], "s1": after["size"], "q0": before["twoq"], "q1": after["twoq"]}},
     })
 
     # 5. Execute: noisy simulator of the device, or real hardware through the Runtime Sampler
@@ -104,17 +106,17 @@ def run(code, level, shots, kind, emit, status):
         sampler.options.dynamical_decoupling.enable = True
         sampler.options.twirling.enable_gates = True
         job = sampler.run([isa], shots=shots)
-        status(f"queued on {backend.name} (IBM job {job.job_id()}), waiting for results...")
-        counts, where = counts_of(job.result()[0]), f"IBM Quantum hardware {backend.name}, job {job.job_id()}"
-        chips = ["dynamical decoupling on", "Pauli twirling on"]
+        status({"k": "queued", "v": {"b": backend.name, "j": job.job_id()}})
+        counts, where = counts_of(job.result()[0]), {"k": "hw", "v": {"b": backend.name, "j": job.job_id()}}
+        chips = [{"k": "dd"}, {"k": "twirl"}]
     else:
-        status("running noisy simulation...")
+        status({"k": "simulating"})
         counts = AerSimulator.from_backend(backend).run(isa, shots=shots).result().get_counts()
-        where, chips = f"noise-model simulation of {backend.name}", []
+        where, chips = {"k": "sim", "v": backend.name}, []
     emit({
         "id": "execute", "title": "5 · Execute",
         "why": "The Sampler runs the circuit many times (shots) and counts each measured bit string.",
-        "chips": [where, f"{shots} shots"] + chips,
+        "chips": [where, {"k": "shots", "v": shots}] + chips,
     })
 
     # 6. Post-process: compare what we measured with the ideal noiseless answer

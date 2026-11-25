@@ -1,8 +1,16 @@
 {
   "id": "superposition",
   "qubits": 1,
-  "gates": [["h", 0]],
-  "expected": { "0": 0.5, "1": 0.5 },
+  "gates": [
+    [
+      "h",
+      0
+    ]
+  ],
+  "expected": {
+    "0": 0.5,
+    "1": 0.5
+  },
   "en": {
     "title": "Superposition",
     "intro": "A bit is 0 or 1. A qubit can be a blend of both until you measure it. The H (Hadamard) gate creates an equal blend.",
@@ -13,9 +21,36 @@
       "Add H, then H again. Two Hadamards cancel out. Surprise: you are back to a certain result."
     ],
     "quiz": [
-      { "q": "What does the H gate do to a qubit that starts at 0?", "options": ["Flips it to 1", "Makes an equal 0/1 blend", "Nothing"], "answer": 1, "why": "H turns a definite 0 into a 50/50 superposition of 0 and 1." },
-      { "q": "You apply H twice in a row. What do you measure?", "options": ["Always 0", "50% 0, 50% 1", "Always 1"], "answer": 0, "why": "The second H undoes the first, so the qubit returns to 0." },
-      { "q": "What does the X gate do to 0?", "options": ["Makes it 1", "Makes a blend", "Nothing"], "answer": 0, "why": "X is the quantum NOT gate: 0 becomes 1 and 1 becomes 0." }
+      {
+        "q": "What does the H gate do to a qubit that starts at 0?",
+        "options": [
+          "Flips it to 1",
+          "Makes an equal 0/1 blend",
+          "Nothing"
+        ],
+        "answer": 1,
+        "why": "H turns a definite 0 into a 50/50 superposition of 0 and 1."
+      },
+      {
+        "q": "You apply H twice in a row. What do you measure?",
+        "options": [
+          "Always 0",
+          "50% 0, 50% 1",
+          "Always 1"
+        ],
+        "answer": 0,
+        "why": "The second H undoes the first, so the qubit returns to 0."
+      },
+      {
+        "q": "What does the X gate do to 0?",
+        "options": [
+          "Makes it 1",
+          "Makes a blend",
+          "Nothing"
+        ],
+        "answer": 0,
+        "why": "X is the quantum NOT gate: 0 becomes 1 and 1 becomes 0."
+      }
     ]
   },
   "hi": {
@@ -28,9 +63,78 @@
       "H जोड़िए, फिर दोबारा H। दो हैडमार्ड एक-दूसरे को काट देते हैं। नतीजा फिर से पक्का हो जाता है।"
     ],
     "quiz": [
-      { "q": "0 से शुरू होने वाले क्यूबिट पर H गेट क्या करता है?", "options": ["उसे 1 कर देता है", "0 और 1 का बराबर मिश्रण बनाता है", "कुछ नहीं"], "answer": 1, "why": "H एक पक्के 0 को 0 और 1 के 50/50 सुपरपोज़िशन में बदल देता है।" },
-      { "q": "आप लगातार दो बार H लगाते हैं। माप में क्या मिलेगा?", "options": ["हमेशा 0", "50% 0, 50% 1", "हमेशा 1"], "answer": 0, "why": "दूसरा H पहले को पलट देता है, इसलिए क्यूबिट वापस 0 हो जाता है।" },
-      { "q": "X गेट 0 के साथ क्या करता है?", "options": ["उसे 1 बना देता है", "मिश्रण बनाता है", "कुछ नहीं"], "answer": 0, "why": "X क्वांटम NOT गेट है: 0 से 1 और 1 से 0।" }
+      {
+        "q": "0 से शुरू होने वाले क्यूबिट पर H गेट क्या करता है?",
+        "options": [
+          "उसे 1 कर देता है",
+          "0 और 1 का बराबर मिश्रण बनाता है",
+          "कुछ नहीं"
+        ],
+        "answer": 1,
+        "why": "H एक पक्के 0 को 0 और 1 के 50/50 सुपरपोज़िशन में बदल देता है।"
+      },
+      {
+        "q": "आप लगातार दो बार H लगाते हैं। माप में क्या मिलेगा?",
+        "options": [
+          "हमेशा 0",
+          "50% 0, 50% 1",
+          "हमेशा 1"
+        ],
+        "answer": 0,
+        "why": "दूसरा H पहले को पलट देता है, इसलिए क्यूबिट वापस 0 हो जाता है।"
+      },
+      {
+        "q": "X गेट 0 के साथ क्या करता है?",
+        "options": [
+          "उसे 1 बना देता है",
+          "मिश्रण बनाता है",
+          "कुछ नहीं"
+        ],
+        "answer": 0,
+        "why": "X क्वांटम NOT गेट है: 0 से 1 और 1 से 0।"
+      }
+    ]
+  },
+  "kn": {
+    "title": "ಸೂಪರ್‌ಪೊಸಿಷನ್",
+    "intro": "ಒಂದು ಬಿಟ್ 0 ಅಥವಾ 1 ಆಗಿರುತ್ತದೆ. ಒಂದು ಕ್ಯೂಬಿಟ್ ಅಳೆಯುವವರೆಗೆ ಎರಡರ ಮಿಶ್ರಣವಾಗಿರಬಹುದು. H (ಹ್ಯಾಡಮಾರ್ಡ್) ಗೇಟ್ ಸಮಾನ ಮಿಶ್ರಣವನ್ನು ಮಾಡುತ್ತದೆ.",
+    "steps": [
+      "ಸರ್ಕ್ಯೂಟ್ ನೋಡಿ: ಒಂದು ಕ್ಯೂಬಿಟ್, ಒಂದು H ಗೇಟ್. ಬಾರ್‌ಗಳು 0 ಬರುವ ಸಾಧ್ಯತೆ 50% ಮತ್ತು 1 ಬರುವ ಸಾಧ್ಯತೆ 50% ಎಂದು ತೋರಿಸುತ್ತವೆ.",
+      "H ಗೇಟ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಅದನ್ನು ತೆಗೆದುಹಾಕಿ. ಕ್ಯೂಬಿಟ್ 0 ಆಗಿಯೇ ಉಳಿಯುತ್ತದೆ, ಆದ್ದರಿಂದ 0 ರ ಬಾರ್ 100% ಆಗುತ್ತದೆ.",
+      "X ಗೇಟ್ ಸೇರಿಸಿ. X, 0 ಅನ್ನು 1 ಆಗಿ ತಿರುಗಿಸುತ್ತದೆ. ಈಗ 1 ರ ಸಾಧ್ಯತೆ 100%.",
+      "H ಸೇರಿಸಿ, ನಂತರ ಮತ್ತೆ H. ಎರಡು ಹ್ಯಾಡಮಾರ್ಡ್‌ಗಳು ಒಂದನ್ನೊಂದು ರದ್ದುಗೊಳಿಸುತ್ತವೆ. ಫಲಿತಾಂಶ ಮತ್ತೆ ಖಚಿತವಾಗುತ್ತದೆ."
+    ],
+    "quiz": [
+      {
+        "q": "0 ಯಿಂದ ಪ್ರಾರಂಭವಾಗುವ ಕ್ಯೂಬಿಟ್‌ಗೆ H ಗೇಟ್ ಏನು ಮಾಡುತ್ತದೆ?",
+        "options": [
+          "ಅದನ್ನು 1 ಮಾಡುತ್ತದೆ",
+          "0 ಮತ್ತು 1 ರ ಸಮಾನ ಮಿಶ್ರಣ ಮಾಡುತ್ತದೆ",
+          "ಏನೂ ಇಲ್ಲ"
+        ],
+        "answer": 1,
+        "why": "H, ಖಚಿತ 0 ಅನ್ನು 0 ಮತ್ತು 1 ರ 50/50 ಸೂಪರ್‌ಪೊಸಿಷನ್ ಆಗಿ ಬದಲಾಯಿಸುತ್ತದೆ."
+      },
+      {
+        "q": "ನೀವು ಸತತವಾಗಿ ಎರಡು ಬಾರಿ H ಹಾಕಿದರೆ ಅಳತೆಯಲ್ಲಿ ಏನು ಸಿಗುತ್ತದೆ?",
+        "options": [
+          "ಯಾವಾಗಲೂ 0",
+          "50% 0, 50% 1",
+          "ಯಾವಾಗಲೂ 1"
+        ],
+        "answer": 0,
+        "why": "ಎರಡನೇ H ಮೊದಲನೆಯದನ್ನು ರದ್ದುಗೊಳಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ಕ್ಯೂಬಿಟ್ ಮತ್ತೆ 0 ಆಗುತ್ತದೆ."
+      },
+      {
+        "q": "X ಗೇಟ್ 0 ಗೆ ಏನು ಮಾಡುತ್ತದೆ?",
+        "options": [
+          "ಅದನ್ನು 1 ಮಾಡುತ್ತದೆ",
+          "ಮಿಶ್ರಣ ಮಾಡುತ್ತದೆ",
+          "ಏನೂ ಇಲ್ಲ"
+        ],
+        "answer": 0,
+        "why": "X ಕ್ವಾಂಟಮ್ NOT ಗೇಟ್: 0 ಯು 1 ಆಗುತ್ತದೆ ಮತ್ತು 1 ಯು 0 ಆಗುತ್ತದೆ."
+      }
     ]
   }
 }

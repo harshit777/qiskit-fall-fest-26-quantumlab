@@ -33,7 +33,8 @@ assert build(BELL).num_qubits == 3
 stages = []
 pipeline.run(BELL, 1, 512, "sim", stages.append, lambda s: None)
 assert [s["id"] for s in stages] == ["build", "decompose", "optimize", "transpile", "execute", "post"]
-assert stages[0]["chips"] == ["sub-circuit: bell"]
+assert stages[0]["chips"] == [{"k": "sub", "v": "bell"}]
+assert stages[3]["p"]["level"] == 1 and stages[3]["note"]["k"] == "delta"
 assert stages[-1]["tvd"] < 0.25, stages[-1]["tvd"]  # noisy but still close to ideal GHZ
 
 stages = []

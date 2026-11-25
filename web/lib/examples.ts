@@ -1,5 +1,5 @@
 export const EXAMPLES: Record<string, string> = {
-  'Bell pair as a reusable gate (compose)': `from qiskit import QuantumCircuit
+  'ex.bell': `from qiskit import QuantumCircuit
 
 # 1. Build a small circuit and turn it into a reusable gate
 bell = QuantumCircuit(2, name="bell")
@@ -12,7 +12,7 @@ qc.append(bell.to_gate(), [0, 1])
 qc.cx(1, 2)
 qc.measure_all()
 `,
-  'Redundant gates (watch the optimizer)': `from qiskit import QuantumCircuit
+  'ex.redundant': `from qiskit import QuantumCircuit
 from math import pi
 
 qc = QuantumCircuit(4)
@@ -25,7 +25,7 @@ qc.cx(0, 1)
 qc.cx(0, 1)      # CX then CX cancels
 qc.measure_all()
 `,
-  'GHZ state with a loop': `from qiskit import QuantumCircuit
+  'ex.ghz': `from qiskit import QuantumCircuit
 
 qc = QuantumCircuit(4)
 qc.h(0)

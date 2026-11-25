@@ -1,8 +1,21 @@
 {
   "id": "entanglement",
   "qubits": 2,
-  "gates": [["h", 0], ["cx", 0, 1]],
-  "expected": { "00": 0.5, "11": 0.5 },
+  "gates": [
+    [
+      "h",
+      0
+    ],
+    [
+      "cx",
+      0,
+      1
+    ]
+  ],
+  "expected": {
+    "00": 0.5,
+    "11": 0.5
+  },
   "en": {
     "title": "Entanglement",
     "intro": "Two entangled qubits share one fate. This circuit makes a Bell pair: H blends qubit 0, then CX copies its choice onto qubit 1.",
@@ -13,9 +26,36 @@
       "Put CX back after both H gates and watch which outcomes survive."
     ],
     "quiz": [
-      { "q": "In the Bell pair, which outcomes can you ever measure?", "options": ["00 and 11", "01 and 10", "All four equally"], "answer": 0, "why": "The two qubits are correlated, so they always give the same result." },
-      { "q": "What does the CX gate need to make entanglement?", "options": ["A qubit already in superposition", "Two qubits at 0", "Nothing"], "answer": 0, "why": "If the control is a definite 0 or 1, CX only copies it. A blended control creates entanglement." },
-      { "q": "Two independent qubits both with H give how many equally likely outcomes?", "options": ["2", "4", "1"], "answer": 1, "why": "Each qubit gives 2 results independently, so 2 × 2 = 4 outcomes at 25% each." }
+      {
+        "q": "In the Bell pair, which outcomes can you ever measure?",
+        "options": [
+          "00 and 11",
+          "01 and 10",
+          "All four equally"
+        ],
+        "answer": 0,
+        "why": "The two qubits are correlated, so they always give the same result."
+      },
+      {
+        "q": "What does the CX gate need to make entanglement?",
+        "options": [
+          "A qubit already in superposition",
+          "Two qubits at 0",
+          "Nothing"
+        ],
+        "answer": 0,
+        "why": "If the control is a definite 0 or 1, CX only copies it. A blended control creates entanglement."
+      },
+      {
+        "q": "Two independent qubits both with H give how many equally likely outcomes?",
+        "options": [
+          "2",
+          "4",
+          "1"
+        ],
+        "answer": 1,
+        "why": "Each qubit gives 2 results independently, so 2 × 2 = 4 outcomes at 25% each."
+      }
     ]
   },
   "hi": {
@@ -28,9 +68,78 @@
       "दोनों H के बाद CX वापस लगाइए और देखिए कौन से नतीजे बचते हैं।"
     ],
     "quiz": [
-      { "q": "बेल जोड़ी में कौन से नतीजे कभी मिल सकते हैं?", "options": ["00 और 11", "01 और 10", "चारों बराबर"], "answer": 0, "why": "दोनों क्यूबिट आपस में जुड़े हैं, इसलिए हमेशा एक जैसा नतीजा देते हैं।" },
-      { "q": "एंटैंगलमेंट बनाने के लिए CX गेट को क्या चाहिए?", "options": ["पहले से सुपरपोज़िशन में एक क्यूबिट", "0 पर दो क्यूबिट", "कुछ नहीं"], "answer": 0, "why": "अगर कंट्रोल पक्का 0 या 1 है तो CX सिर्फ़ नकल करता है। मिश्रित कंट्रोल से एंटैंगलमेंट बनता है।" },
-      { "q": "दो स्वतंत्र क्यूबिट्स दोनों पर H लगाने से कितने बराबर संभावना वाले नतीजे मिलते हैं?", "options": ["2", "4", "1"], "answer": 1, "why": "हर क्यूबिट अलग से 2 नतीजे देता है, इसलिए 2 × 2 = 4 नतीजे, हर एक 25%।" }
+      {
+        "q": "बेल जोड़ी में कौन से नतीजे कभी मिल सकते हैं?",
+        "options": [
+          "00 और 11",
+          "01 और 10",
+          "चारों बराबर"
+        ],
+        "answer": 0,
+        "why": "दोनों क्यूबिट आपस में जुड़े हैं, इसलिए हमेशा एक जैसा नतीजा देते हैं।"
+      },
+      {
+        "q": "एंटैंगलमेंट बनाने के लिए CX गेट को क्या चाहिए?",
+        "options": [
+          "पहले से सुपरपोज़िशन में एक क्यूबिट",
+          "0 पर दो क्यूबिट",
+          "कुछ नहीं"
+        ],
+        "answer": 0,
+        "why": "अगर कंट्रोल पक्का 0 या 1 है तो CX सिर्फ़ नकल करता है। मिश्रित कंट्रोल से एंटैंगलमेंट बनता है।"
+      },
+      {
+        "q": "दो स्वतंत्र क्यूबिट्स दोनों पर H लगाने से कितने बराबर संभावना वाले नतीजे मिलते हैं?",
+        "options": [
+          "2",
+          "4",
+          "1"
+        ],
+        "answer": 1,
+        "why": "हर क्यूबिट अलग से 2 नतीजे देता है, इसलिए 2 × 2 = 4 नतीजे, हर एक 25%।"
+      }
+    ]
+  },
+  "kn": {
+    "title": "ಎಂಟ್ಯಾಂಗಲ್‌ಮೆಂಟ್",
+    "intro": "ಎರಡು ಎಂಟ್ಯಾಂಗಲ್ ಆದ ಕ್ಯೂಬಿಟ್‌ಗಳ ಹಣೆಬರಹ ಒಂದೇ ಆಗಿರುತ್ತದೆ. ಈ ಸರ್ಕ್ಯೂಟ್ ಬೆಲ್ ಜೋಡಿಯನ್ನು ಮಾಡುತ್ತದೆ: H ಕ್ಯೂಬಿಟ್ 0 ಅನ್ನು ಮಿಶ್ರಣ ಮಾಡುತ್ತದೆ, ನಂತರ CX ಅದರ ಆಯ್ಕೆಯನ್ನು ಕ್ಯೂಬಿಟ್ 1 ಗೆ ನಕಲು ಮಾಡುತ್ತದೆ.",
+    "steps": [
+      "ಬಾರ್‌ಗಳು 00 ಮತ್ತು 11 ಮಾತ್ರ ತೋರಿಸುತ್ತವೆ, 01 ಅಥವಾ 10 ಎಂದಿಗೂ ಇಲ್ಲ. ಎರಡೂ ಕ್ಯೂಬಿಟ್‌ಗಳು ಯಾವಾಗಲೂ ಒಂದೇ ಫಲಿತಾಂಶ ನೀಡುತ್ತವೆ.",
+      "CX ಗೇಟ್ ತೆಗೆದುಹಾಕಿ. ಈಗ ಕ್ಯೂಬಿಟ್‌ಗಳು ಸ್ವತಂತ್ರ. ಕ್ಯೂಬಿಟ್ 0 ಮಾತ್ರ ಮಿಶ್ರಿತವಾಗಿದೆ, ಆದ್ದರಿಂದ 00 ಮತ್ತು 01 ತಲಾ 50% ಕಾಣುತ್ತವೆ.",
+      "ಕ್ಯೂಬಿಟ್ 1 ಮೇಲೂ H ಸೇರಿಸಿ. CX ಇಲ್ಲದೆ ನಾಲ್ಕೂ ಫಲಿತಾಂಶಗಳು ತಲಾ 25% ಬರುತ್ತವೆ. ಅಂದರೆ ಎರಡು ಪ್ರತ್ಯೇಕ ನಾಣ್ಯಗಳು.",
+      "ಎರಡೂ H ಗಳ ನಂತರ CX ಅನ್ನು ಮತ್ತೆ ಹಾಕಿ ಮತ್ತು ಯಾವ ಫಲಿತಾಂಶಗಳು ಉಳಿಯುತ್ತವೆ ಎಂದು ನೋಡಿ."
+    ],
+    "quiz": [
+      {
+        "q": "ಬೆಲ್ ಜೋಡಿಯಲ್ಲಿ ಯಾವ ಫಲಿತಾಂಶಗಳು ಸಿಗಬಹುದು?",
+        "options": [
+          "00 ಮತ್ತು 11",
+          "01 ಮತ್ತು 10",
+          "ನಾಲ್ಕೂ ಸಮಾನವಾಗಿ"
+        ],
+        "answer": 0,
+        "why": "ಎರಡೂ ಕ್ಯೂಬಿಟ್‌ಗಳು ಪರಸ್ಪರ ಜೋಡಣೆಯಾಗಿವೆ, ಆದ್ದರಿಂದ ಯಾವಾಗಲೂ ಒಂದೇ ಫಲಿತಾಂಶ ನೀಡುತ್ತವೆ."
+      },
+      {
+        "q": "ಎಂಟ್ಯಾಂಗಲ್‌ಮೆಂಟ್ ಮಾಡಲು CX ಗೇಟ್‌ಗೆ ಏನು ಬೇಕು?",
+        "options": [
+          "ಈಗಾಗಲೇ ಸೂಪರ್‌ಪೊಸಿಷನ್‌ನಲ್ಲಿರುವ ಒಂದು ಕ್ಯೂಬಿಟ್",
+          "0 ಯಲ್ಲಿರುವ ಎರಡು ಕ್ಯೂಬಿಟ್‌ಗಳು",
+          "ಏನೂ ಬೇಕಿಲ್ಲ"
+        ],
+        "answer": 0,
+        "why": "ಕಂಟ್ರೋಲ್ ಖಚಿತ 0 ಅಥವಾ 1 ಆಗಿದ್ದರೆ CX ಕೇವಲ ನಕಲು ಮಾಡುತ್ತದೆ. ಮಿಶ್ರಿತ ಕಂಟ್ರೋಲ್ ಎಂಟ್ಯಾಂಗಲ್‌ಮೆಂಟ್ ಸೃಷ್ಟಿಸುತ್ತದೆ."
+      },
+      {
+        "q": "ಎರಡು ಸ್ವತಂತ್ರ ಕ್ಯೂಬಿಟ್‌ಗಳಿಗೂ H ಹಾಕಿದರೆ ಎಷ್ಟು ಸಮಾನ ಸಂಭವನೀಯತೆಯ ಫಲಿತಾಂಶಗಳು ಸಿಗುತ್ತವೆ?",
+        "options": [
+          "2",
+          "4",
+          "1"
+        ],
+        "answer": 1,
+        "why": "ಪ್ರತಿ ಕ್ಯೂಬಿಟ್ ಸ್ವತಂತ್ರವಾಗಿ 2 ಫಲಿತಾಂಶ ನೀಡುತ್ತದೆ, ಆದ್ದರಿಂದ 2 × 2 = 4 ಫಲಿತಾಂಶಗಳು, ತಲಾ 25%."
+      }
     ]
   }
 }

@@ -1,25 +1,21 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { LESSONS, type Lang } from '@/lib/lessons'
+import { LESSONS } from '@/lib/lessons'
+import { useLang, useT } from '@/lib/i18n'
 import { probabilities, type Gate } from '@/lib/sim'
 import { Header } from '@/components/header'
-
-const UI = {
-  en: { lessons: 'Lessons', circuit: 'Circuit', add: 'Add gate to qubit', reset: 'Reset to lesson', remove: 'Click a gate to remove it', hist: 'Measurement probabilities', walk: 'Try this', quiz: 'Quiz', score: 'Score', nogates: 'No gates: the qubits stay at 0.', site: 'Back to susinbinary.com', tag: 'Quantum learning for every student, with no hardware and no heavy math.' },
-  hi: { lessons: 'पाठ', circuit: 'सर्किट', add: 'क्यूबिट पर गेट जोड़ें', reset: 'पाठ का मूल सर्किट', remove: 'गेट हटाने के लिए उस पर क्लिक करें', hist: 'माप की संभावनाएँ', walk: 'आज़माइए', quiz: 'प्रश्नोत्तरी', score: 'स्कोर', nogates: 'कोई गेट नहीं: क्यूबिट 0 पर ही रहते हैं।', site: 'susinbinary.com पर वापस', tag: 'हर विद्यार्थी के लिए क्वांटम सीखना, बिना हार्डवेयर और भारी गणित के।' },
-} as const
 
 const label = (g: Gate) => g.g.toUpperCase()
 
 export function Lab() {
-  const [lang, setLang] = useState<Lang>('en')
+  const { lang } = useLang()
+  const t = useT()
   const [li, setLi] = useState(0)
   const lesson = LESSONS[li]
   const [gates, setGates] = useState<Gate[]>(lesson.gates)
   const [target, setTarget] = useState(0)
   const [picked, setPicked] = useState<Record<string, number>>({})
-  const t = UI[lang]
   const text = lesson[lang]
   const probs = useMemo(() => probabilities(lesson.qubits, gates), [lesson.qubits, gates])
   const other = (target + 1) % lesson.qubits
@@ -35,30 +31,14 @@ export function Lab() {
 
   return (
     <div lang={lang}>
-      <Header
-        active="/"
-        right={
-          <div role="group" aria-label="Language" className="flex gap-1 font-mono text-[12px]">
-            {(['en', 'hi'] as const).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                aria-pressed={lang === l}
-                className={`rounded px-3 py-1.5 ${lang === l ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900'}`}
-              >
-                {l === 'en' ? 'English' : 'हिन्दी'}
-              </button>
-            ))}
-          </div>
-        }
-      />
+      <Header active="/" />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         <p className="font-mono text-[12px] text-accent">QFF 2026 · Education · Team SusInBinary</p>
         <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight">QuantumLab</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{t.tag}</p>
+        <p className="mt-2 max-w-2xl text-slate-600">{t('tag')}</p>
 
-        <nav aria-label={t.lessons} className="mt-8 flex flex-wrap gap-2">
+        <nav aria-label={t('lessons')} className="mt-8 flex flex-wrap gap-2">
           {LESSONS.map((l, i) => (
             <button
               key={l.id}
@@ -75,14 +55,14 @@ export function Lab() {
           <section className="rounded-lg border border-border bg-surface p-6">
             <h2 className="font-heading text-2xl font-bold">{text.title}</h2>
             <p className="mt-2">{text.intro}</p>
-            <h3 className="mt-5 font-mono text-[12px] font-bold uppercase text-accent">{t.walk}</h3>
+            <h3 className="mt-5 font-mono text-[12px] font-bold uppercase text-accent">{t('walk')}</h3>
             <ol className="mt-2 list-decimal space-y-2 pl-5">
               {text.steps.map((s) => <li key={s}>{s}</li>)}
             </ol>
           </section>
 
           <section className="rounded-lg border border-border p-6">
-            <h2 className="font-mono text-[12px] font-bold uppercase text-accent">{t.circuit}</h2>
+            <h2 className="font-mono text-[12px] font-bold uppercase text-accent">{t('circuit')}</h2>
             <div className="mt-3 overflow-x-auto font-mono text-sm">
               {Array.from({ length: lesson.qubits }, (_, q) => (
                 <div key={q} className="flex h-11 items-center">
@@ -108,12 +88,12 @@ export function Lab() {
                   </div>
                 </div>
               ))}
-              {gates.length === 0 && <p className="text-slate-500">{t.nogates}</p>}
+              {gates.length === 0 && <p className="text-slate-500">{t('nogates')}</p>}
             </div>
-            <p className="mt-2 text-xs text-slate-500">{t.remove}</p>
+            <p className="mt-2 text-xs text-slate-500">{t('remove')}</p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2 font-mono text-sm">
-              <span className="text-slate-600">{t.add}</span>
+              <span className="text-slate-600">{t('add')}</span>
               {lesson.qubits > 1 && (
                 <select aria-label="qubit" value={target} onChange={(e) => setTarget(+e.target.value)} className="rounded border border-border px-2 py-1">
                   {Array.from({ length: lesson.qubits }, (_, q) => <option key={q} value={q}>q{q}</option>)}
@@ -124,10 +104,10 @@ export function Lab() {
                   {g.toUpperCase()}
                 </button>
               ))}
-              <button onClick={() => setGates(lesson.gates)} className="ml-auto text-slate-500 underline hover:text-slate-900">{t.reset}</button>
+              <button onClick={() => setGates(lesson.gates)} className="ml-auto text-slate-500 underline hover:text-slate-900">{t('reset')}</button>
             </div>
 
-            <h2 className="mt-6 font-mono text-[12px] font-bold uppercase text-accent">{t.hist}</h2>
+            <h2 className="mt-6 font-mono text-[12px] font-bold uppercase text-accent">{t('hist')}</h2>
             <ul className="mt-3 space-y-2 font-mono text-sm">
               {probs.map((p, i) => {
                 const key = i.toString(2).padStart(lesson.qubits, '0')
@@ -147,7 +127,7 @@ export function Lab() {
         </div>
 
         <section className="mt-6 rounded-lg border border-border p-6">
-          <h2 className="font-mono text-[12px] font-bold uppercase text-accent">{t.quiz} · {t.score} {score}/{text.quiz.length}</h2>
+          <h2 className="font-mono text-[12px] font-bold uppercase text-accent">{t('quiz')} · {t('score')} {score}/{text.quiz.length}</h2>
           <div className="mt-3 grid gap-6 md:grid-cols-3">
             {text.quiz.map((q, k) => {
               const id = `${lesson.id}-${k}`
@@ -175,7 +155,7 @@ export function Lab() {
         </section>
 
         <footer className="mt-10 border-t border-border pt-6 font-mono text-[12px] text-slate-500">
-          <a href="https://susinbinary.com" className="underline hover:text-slate-900">{t.site}</a>
+          <a href="https://susinbinary.com" className="underline hover:text-slate-900">{t('site')}</a>
           {' · '}
           <a href="https://github.com/harshit777/qiskit-fall-fest-26-quantumlab" className="underline hover:text-slate-900">GitHub</a>
           {' · MIT · Qiskit'}

@@ -12,7 +12,7 @@
 | Whole-site quantum revamp? | **Defer.** Build a standalone QuantumLab app now; link it from susinbinary.com later. | Judges score the repo, demo and video. A full redesign scores 0 points. The revamp is Phase 4, after submission. |
 | What do we build? | **QuantumLab**: multilingual interactive lessons. The learner changes a gate and the measurement histogram updates live. | Matches the "Your Challenge" and "Quantum Approach" boxes exactly. |
 | Concepts | 3 lessons: **Superposition (H)**, **Entanglement (Bell)**, **Grover (2-qubit)** | Brief asks for 3 guided lessons with quizzes. Each maps to Day 1/Day 2 workshop notebooks (`QFF-2026-Quantum-for-Humanity`). |
-| Languages | **English + Hindi** (required: 2+). Add a 3rd (Kannada/Tamil/Marathi) only if finished early. | Content lives in JSON, so each language is just another file. |
+| Languages | **English + Hindi + Kannada** (required: 2+). All of the UI and lessons are translated, and `npm test` enforces completeness. | Content lives in JSON, so each language is just another file. |
 | Live histogram | **Tiny TypeScript statevector simulator in the browser** (1–3 qubits, about 60 lines). | Instant updates, works offline, deploys free on Vercel or Render. Python can't run inside Next.js. |
 | "Real Qiskit circuits" | Each lesson ships a **Qiskit notebook/script**. A **parity test** asserts that Qiskit Aer and the TS simulator give the same probabilities. | Judges want correct Qiskit use and reproducibility (30%). The parity test proves the web demo is not fake. |
 | Hardware | Run Bell + Grover once on **IBM Quantum hardware via Runtime `SamplerV2`**. Save the counts and compare them with the noise-model simulation. | "Strongly recommended" row, and it feeds the innovation/honesty score. |
