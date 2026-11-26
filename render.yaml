@@ -1,0 +1,21 @@
+# Render Blueprint: the Python Qiskit API. The Next.js app (web/) deploys to Vercel and proxies /api to this URL.
+services:
+  - type: web
+    name: quantumlab-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: python quantum/server.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: HOST
+        value: 0.0.0.0
+      # Render sets PORT itself. Hardware stays off unless you add these two in the dashboard:
+      #   ENABLE_HARDWARE=1 and QUANTUM_API_KEY=<your IBM key>
+      - key: ENABLE_HARDWARE
+        value: "0"
+      - key: MAX_SIM_JOBS
+        value: "2"

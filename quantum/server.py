@@ -1,7 +1,8 @@
 """HTTP API for the Code tab. Runs the Qiskit lifecycle server-side; the browser never sees the IBM key.
 
 Run: python quantum/server.py        (127.0.0.1:8000; set HOST/PORT to change)
-Hardware is OFF unless ENABLE_HARDWARE=1 and QUANTUM_API_KEY are set, and only one hardware job runs at a time.
+Hardware is OFF unless ENABLE_HARDWARE=1 and QUANTUM_API_KEY are set. Concurrency is capped (1 hardware job,
+MAX_SIM_JOBS simulator jobs, default 2) so a public deployment cannot be overloaded; extra requests get HTTP 429.
 """
 import json
 import os
@@ -16,14 +17,15 @@ from sandbox import SandboxError
 
 load_dotenv()
 JOBS, MAX_JOBS, MAX_BODY = {}, 50, 20000
-HW = threading.Lock()
+HW = threading.BoundedSemaphore(1)
+SIM = threading.BoundedSemaphore(int(os.getenv("MAX_SIM_JOBS", "2")))
 
 
 def hardware_enabled():
     return os.getenv("ENABLE_HARDWARE") == "1" and bool(os.getenv("QUANTUM_API_KEY"))
 
 
-def work(job, p, hw):
+def work(job, p, gate):
     try:
         pipeline.run(p["code"], p["level"], p["shots"], p["backend"], job["stages"].append, lambda s: job.update(phase=s))
         job["status"] = "done"
@@ -32,8 +34,7 @@ def work(job, p, hw):
         key = os.getenv("QUANTUM_API_KEY")
         job.update(status="error", error=(msg.replace(key, "***") if key else msg)[:600])
     finally:
-        if hw:
-            HW.release()
+        gate.release()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -69,13 +70,14 @@ class Handler(BaseHTTPRequestHandler):
         hw = p["backend"] == "ibm"
         if hw and not hardware_enabled():
             return self.send(403, {"error": "IBM hardware is not enabled on this server"})
-        if hw and not HW.acquire(blocking=False):
-            return self.send(429, {"error": "a hardware job is already running, try again in a few minutes"})
+        gate = HW if hw else SIM
+        if not gate.acquire(blocking=False):
+            return self.send(429, {"error": "the server is busy with other runs, try again in a minute"})
         jid = uuid.uuid4().hex[:12]
         JOBS[jid] = job = {"status": "running", "phase": None, "stages": [], "error": None, "hardware": hw}
         while len(JOBS) > MAX_JOBS:
             JOBS.pop(next(iter(JOBS)))
-        threading.Thread(target=work, args=(job, p, hw), daemon=True).start()
+        threading.Thread(target=work, args=(job, p, gate), daemon=True).start()
         self.send(200, {"id": jid})
 
 
