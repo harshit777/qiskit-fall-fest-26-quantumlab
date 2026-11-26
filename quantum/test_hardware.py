@@ -61,3 +61,19 @@ assert SECRET not in json.dumps(job), "api key leaked into the job record"
 assert SECRET not in json.dumps(server.JOBS), "api key leaked into the job store"
 print("ok server: needKey/badKey rejected, wrong key -> keyed error, key absent from job store")
 httpd.shutdown()
+
+# 3. memory: the noise-model replay must stay under the 512 MB free-server limit on a 156-qubit device
+#    (whole-process peak, including sections 1-2 above; the old full-model replay alone peaked at 617 MB)
+import resource
+from qiskit import QuantumCircuit, transpile
+from qiskit_ibm_runtime.fake_provider import FakeFez
+
+fez = FakeFez()
+bell = QuantumCircuit(2)
+bell.h(0)
+bell.cx(0, 1)
+bell.measure_all()
+counts = pipeline.replay(transpile(bell, fez, optimization_level=3, seed_transpiler=7), fez, 1024)
+peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6  # bytes on macOS (KB on Linux: only smaller)
+assert peak < 480 and counts.get("00", 0) + counts.get("11", 0) > 900, (peak, counts)
+print(f"ok memory: 156-qubit replay peak {peak:.0f} MB")

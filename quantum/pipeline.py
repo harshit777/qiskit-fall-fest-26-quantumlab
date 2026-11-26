@@ -12,6 +12,7 @@ from qiskit.providers.fake_provider import GenericBackendV2
 from qiskit.transpiler import CouplingMap
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
 
 from sandbox import build
 
@@ -46,6 +47,20 @@ def open_ibm(api_key, min_qubits):
 def sim_backend():
     """Deterministic 5-qubit noisy device with a line topology (stand-in for real hardware)."""
     return GenericBackendV2(num_qubits=5, coupling_map=CouplingMap.from_line(5), basis_gates=BASIS, seed=42)
+
+
+def replay(isa, backend, shots):
+    """Noise-model replay of a transpiled circuit, keeping only the noise of the qubits it uses.
+    Replaying the full 156-qubit model peaked at 617 MB (measured), which OOM-killed the 512 MB free server; this peaks near 343 MB.
+    ponytail: edits NoiseModel's private dicts (qiskit-aer pinned to 0.18.4); re-check when upgrading."""
+    used = {isa.find_bit(q).index for i in isa.data for q in i.qubits}
+    nm = NoiseModel.from_backend(backend)
+    for errs in nm._local_quantum_errors.values():
+        for qs in [qs for qs in errs if not set(qs) <= used]:
+            del errs[qs]
+    for qs in [qs for qs in nm._local_readout_errors if not set(qs) <= used]:
+        del nm._local_readout_errors[qs]
+    return AerSimulator(noise_model=nm, basis_gates=nm.basis_gates).run(isa, shots=shots).result().get_counts()
 
 
 def stats(c: QuantumCircuit):
@@ -152,7 +167,10 @@ def run(code, level, shots, kind, emit, status, api_key=None, backend=None):
         where = {"k": "hw", "v": {"b": backend.name, "j": jid}}
         chips = [{"k": "dd"}, {"k": "twirl"}]
         status({"k": "simulating"})
-        noisy = AerSimulator.from_backend(backend).run(isa, shots=shots).result().get_counts()  # same device noise, simulated
+        try:
+            noisy = replay(isa, backend, shots)  # same device noise, simulated; never lose the real result over it
+        except Exception:
+            noisy = None
     else:
         status({"k": "simulating"})
         counts = AerSimulator.from_backend(backend).run(isa, shots=shots).result().get_counts()
