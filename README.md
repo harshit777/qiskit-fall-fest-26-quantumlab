@@ -58,6 +58,7 @@ Needs Node 20+ and Python 3.11+.
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python quantum/parity_test.py                # Qiskit exact + Aer vs expected probabilities
+python quantum/baseline.py                   # classical baseline table
 python quantum/test_pipeline.py              # Code tab backend: sandbox + 6 lifecycle stages
 python quantum/server.py                     # Qiskit API on 127.0.0.1:8000 (keep running)
 
@@ -85,7 +86,19 @@ Verified so far (simulator only):
 | Entanglement | 2 | 2 | 2 | yes |
 | Grover (2 qubits) | 2 | 6 | 10 | yes |
 
-TODO: real-hardware run (use the Code tab's *Download results* file, commit it under `results/`), classical baseline comparison, learner test (pre/post).
+### Classical baseline vs quantum
+
+`python quantum/baseline.py` (seeded, 4096 shots, quantum column = noise model of the 127-qubit `FakeSherbrooke`, optimization level 3). TVD = total variation distance to the ideal histogram (lower is better). The classical program is the simplest one that produces the same histogram: a coin flip, a shared coin copied to both bits, or a random guess for Grover. Depths include the final measurement.
+
+| Lesson | Classical TVD | Quantum (noise model) TVD | Logical depth | Transpiled depth | Oracle queries classical / quantum |
+| --- | --- | --- | --- | --- | --- |
+| superposition | 0.013 | 0.001 | 2 | 4 | n/a |
+| entanglement | 0.004 | 0.016 | 3 | 6 | n/a |
+| grover | 0.751 | 0.025 | 7 | 18 | 2.25 / 1 |
+
+Reading it honestly: for superposition and entanglement a classical program reproduces the histogram just as well (the lessons teach the concept, not an advantage). Grover finds the marked item with 1 oracle query where classical search needs 2.25 on average for 4 items, but that is a toy size and is not a practical speedup.
+
+TODO: real-hardware run (use the Code tab's *Download results* file, commit it under `results/`) and the learner test (pre/post).
 
 ## Error mitigation
 Hardware runs in the Code tab turn on dynamical decoupling and gate Pauli twirling in the Runtime `SamplerV2`, and the optimization level is chosen by the learner (level 3 gives the shallowest circuit). The report compares hardware against a noise-model replay on the same device. TODO: record the measured effect from a real run.
