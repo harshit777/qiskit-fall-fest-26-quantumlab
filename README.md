@@ -2,6 +2,10 @@
 
 QFF 2026 · Track: Education · Case Study 3 · Team: **SusInBinary**
 
+**Live demo:** https://quantumlab-fawn.vercel.app (also at https://quantum.susinbinary.com once DNS finishes) · Code tab API: https://quantumlab-api.onrender.com
+
+> The Code tab API runs on a free Render instance that sleeps when idle. The first run after a quiet period can take about a minute. The hosted demo runs on the noise-model simulator. IBM hardware is switched off on the public server and enabled only locally with an API key.
+
 > Status: work in progress. Sections marked TODO are filled in as we run things. We don't claim anything we haven't run. Plan: [PLAN.md](PLAN.md).
 
 ## Problem
@@ -37,6 +41,13 @@ flowchart LR
   HW --> R[results/*.json]
   QK -->|noise model of same backend| R
 ```
+
+## Deployment
+
+| Part | Host | How |
+| --- | --- | --- |
+| `web/` Next.js app | Vercel (project root directory `web`) | `vercel deploy --prod`; env `QISKIT_API_URL` points at the API |
+| `quantum/server.py` Qiskit API | Render free web service | `render.yaml` (build `pip install -r requirements.txt`, start `python quantum/server.py`, health `/api/health`) |
 
 ## How to run
 
