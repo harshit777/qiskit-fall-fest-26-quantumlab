@@ -4,7 +4,7 @@ QFF 2026 · Track: Education · Case Study 3 · Team: **SusInBinary**
 
 **Live demo:** https://quantumlab-fawn.vercel.app (also at https://quantum.susinbinary.com once DNS finishes) · Code tab API: https://quantumlab-api.onrender.com
 
-> The Code tab API runs on a free Render instance that sleeps when idle. The first run after a quiet period can take about a minute. The hosted demo runs on the noise-model simulator. IBM hardware is switched off on the public server and enabled only locally with an API key.
+> The Code tab API runs on a free Render instance that sleeps when idle. The first run after a quiet period can take about a minute. Hardware runs on the hosted site use the visitor's own IBM key (used for that single run, never stored or logged). Without a key the demo runs on the noise-model simulator.
 
 > Status: work in progress. Sections marked TODO are filled in as we run things. We don't claim anything we haven't run. Plan: [PLAN.md](PLAN.md).
 
@@ -18,7 +18,7 @@ QuantumLab teaches three core ideas as guided lessons with quizzes, in **English
 2. **Entanglement** (Bell pair: H + CX)
 3. **Grover search** (2 qubits, 1 round)
 
-**Code tab (`/code`):** the learner writes real Qiskit and the **server** walks it through the IBM circuit lifecycle: build & compose, decompose, optimize (levels 0-3 compared), transpile for a device, execute, and post-process (ideal vs measured, total variation distance). Execution goes to a noise-model simulator of a 5-qubit device, or to **IBM Quantum hardware** through the Runtime `SamplerV2` when the server has an API key and `ENABLE_HARDWARE=1`.
+**Code tab (`/code`):** the learner writes real Qiskit and the **server** walks it through the IBM circuit lifecycle: build & compose, decompose, optimize (levels 0-3 compared), transpile for a device, execute, and post-process (ideal vs measured, total variation distance). Execution goes to a noise-model simulator of a 5-qubit device, or to **real IBM Quantum hardware** through the Runtime `SamplerV2`: choose *IBM Quantum hardware*, paste your own IBM API key, run. The server picks the least busy device, turns on dynamical decoupling and Pauli twirling, then replays the same transpiled circuit on that device's noise model. The page shows ideal vs real hardware vs noise model side by side, and a **Download results (JSON)** button saves the full report (backend, job id, counts, depth, TVD) for the README and the pitch.
 
 The learner adds or removes gates (H, X, Z, CX, CZ) and the measurement histogram updates instantly. It runs in the browser, so it needs no hardware, no install and no heavy maths.
 
@@ -37,7 +37,7 @@ flowchart LR
   PL -->|SamplerV2| HW
   J --> QK[quantum/ Qiskit circuits]
   QK -->|parity_test.py| AER[Aer simulator]
-  QK -->|run_hardware.py SamplerV2| HW[IBM Quantum hardware]
+  QK -->|SamplerV2, user IBM key| HW[IBM Quantum hardware]
   HW --> R[results/*.json]
   QK -->|noise model of same backend| R
 ```
@@ -65,13 +65,13 @@ python quantum/server.py                     # Qiskit API on 127.0.0.1:8000 (kee
 cd web && npm install && npm run dev        # http://localhost:3000  (/code needs step 1's server)
 npm test                                     # browser simulator vs expected probabilities
 
-# 3. Real hardware (needs an IBM Quantum API key)
-cp .env.example .env                         # QUANTUM_API_KEY=..., and ENABLE_HARDWARE=1 to allow it in the Code tab
-python quantum/run_hardware.py               # saves results/<lesson>.json
+# 3. Real hardware: open the Code tab, pick "IBM Quantum hardware", paste your IBM API key, Run.
+#    (Optional, your own private server: put QUANTUM_API_KEY and ENABLE_HARDWARE=1 in .env and the key field can stay empty.)
+python quantum/test_hardware.py              # hardware path against a fake 127-qubit device, no key needed
 ```
 
 ### Security of the Code tab
-Learner code is **never** passed to `exec` or `eval`. `quantum/sandbox.py` parses it with `ast` and interprets only a whitelist (QuantumCircuit, gate methods, compose/append, `range` loops, numeric maths), with caps on qubits (5), loop size, statements and circuit size. `test_pipeline.py` checks that 14 attack patterns (imports, `open`, `exec`, dunder access, comprehensions, `while`, huge loops) are rejected. Hardware jobs are off by default, run one at a time, and the IBM key stays on the server (the browser only talks to the `/api` proxy).
+Learner code is **never** passed to `exec` or `eval`. `quantum/sandbox.py` parses it with `ast` and interprets only a whitelist (QuantumCircuit, gate methods, compose/append, `range` loops, numeric maths), with caps on qubits (5), loop size, statements and circuit size. `test_pipeline.py` checks that 14 attack patterns (imports, `open`, `exec`, dunder access, comprehensions, `while`, huge loops) are rejected. Hardware runs need the visitor's own IBM key, run one at a time, give up after 20 minutes in the queue, and the key is used for that one run only: it is never saved, put in the job record, logged, or included in the downloaded report (`test_hardware.py` checks this), and errors are scrubbed of it.
 
 Versions are pinned in [`requirements.txt`](requirements.txt) (Qiskit 2.6.2, Aer 0.18.4, IBM Runtime 0.52.1) and `web/package.json`.
 
@@ -85,10 +85,10 @@ Verified so far (simulator only):
 | Entanglement | 2 | 2 | 2 | yes |
 | Grover (2 qubits) | 2 | 6 | 10 | yes |
 
-TODO: hardware vs noise-model counts, transpiled depth (`results/`), classical baseline comparison, learner test (pre/post).
+TODO: real-hardware run (use the Code tab's *Download results* file, commit it under `results/`), classical baseline comparison, learner test (pre/post).
 
 ## Error mitigation
-`quantum/run_hardware.py` turns on dynamical decoupling and gate Pauli twirling in the Runtime `SamplerV2` and transpiles at `optimization_level=3`. TODO: record the measured effect.
+Hardware runs in the Code tab turn on dynamical decoupling and gate Pauli twirling in the Runtime `SamplerV2`, and the optimization level is chosen by the learner (level 3 gives the shallowest circuit). The report compares hardware against a noise-model replay on the same device. TODO: record the measured effect from a real run.
 
 ## Limitations and next steps
 - The browser simulator is exact and noiseless, and supports up to a few qubits with real amplitudes only (H, X, Z, CX, CZ).

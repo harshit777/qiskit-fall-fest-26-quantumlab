@@ -51,7 +51,7 @@ qiskit-fall-fest-hackathon-26/
   PLAN.md                 this file
   README.md               problem, approach, how to run, results (judged)
   requirements.txt        pinned versions (create on day 1: pip freeze | grep -E "qiskit|numpy|matplotlib")
-  qiskit/                 lesson circuits (.py + .ipynb), run_hardware.py, parity_test.py
+  qiskit/                 lesson circuits (.py + .ipynb), parity_test.py
   lessons/                lesson-1-superposition.{en,hi}.json, lesson-2-..., lesson-3-...
   results/                hardware + noise-model counts (json), comparison table, depth stats
   docs/                   architecture.png, pitch-script.md, learner-test.md, screenshots

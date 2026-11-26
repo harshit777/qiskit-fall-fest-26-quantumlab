@@ -25,6 +25,14 @@ qc.cx(0, 1)
 qc.cx(0, 1)      # CX then CX cancels
 qc.measure_all()
 `,
+  'ex.lesson': `from qiskit import QuantumCircuit
+
+# The Entanglement lesson: a Bell pair. Try it on real hardware.
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+`,
   'ex.ghz': `from qiskit import QuantumCircuit
 
 qc = QuantumCircuit(4)

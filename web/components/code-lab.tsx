@@ -13,10 +13,13 @@ type Stage = {
   stats?: { depth: number; size: number; twoq: number }
   diagrams?: { label: string; text: string }[]
   table?: { head: string[]; rows: (string | number)[][]; highlight: number }
-  histogram?: { key: string; ideal: number; measured: number }[]
+  histogram?: { key: string; ideal: number; measured: number; model?: number }[]
   tvd?: number
+  tvdModel?: number
+  hardware?: boolean
 }
-type Job = { status: string; phase: Msg | null; stages: Stage[]; error: string | null }
+type Job = { status: string; phase: Msg | null; stages: (Stage | Report)[]; error: { k: string; v?: Record<string, string | number> } | null }
+type Report = { id: 'report'; backend: string; job: string; [k: string]: unknown }
 
 const ORDER = ['build', 'decompose', 'optimize', 'transpile', 'execute', 'post']
 const first = Object.keys(EXAMPLES)[0]
@@ -29,14 +32,15 @@ export function CodeLab() {
   const [level, setLevel] = useState(1)
   const [shots, setShots] = useState(1024)
   const [backend, setBackend] = useState<'sim' | 'ibm'>('sim')
-  const [hardware, setHardware] = useState(false)
+  const [serverKey, setServerKey] = useState(false)
+  const [apiKey, setApiKey] = useState('')
   const [job, setJob] = useState<Job | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
-    fetch('/api/health').then((r) => r.json()).then((d) => setHardware(!!d.hardware)).catch(() => setError('noServer'))
+    fetch('/api/health').then((r) => r.json()).then((d) => setServerKey(!!d.serverKey)).catch(() => setError('noServer'))
     return () => clearTimeout(timer.current)
   }, [])
 
@@ -57,18 +61,20 @@ export function CodeLab() {
     setBusy(true)
     setError(null)
     setJob(null)
-    const r = await fetch('/api/run', { method: 'POST', body: JSON.stringify({ code, level, shots, backend }) }).catch(() => null)
+    const r = await fetch('/api/run', { method: 'POST', body: JSON.stringify({ code, level, shots, backend, apiKey: backend === 'ibm' ? apiKey.trim() : undefined }) }).catch(() => null)
     const d = await r?.json().catch(() => null)
     if (!r || !r.ok) {
-      setError(d?.error ?? 'noServer')
+      setError(d?.error?.k ?? 'noServer')
       setBusy(false)
       return
     }
+    setApiKey('')
     poll(d.id)
   }
 
   const done = new Set(job?.stages.map((s) => s.id))
-  const showError = (e: string) => (e === 'noServer' || e === 'lost' ? t(e) : e)
+  const showError = (e: string) => t(e)
+  const jobError = (e: NonNullable<Job['error']>) => (e.k === 'raw' ? String(e.v) : t(e.k, e.v ?? {}))
   const current = ORDER.find((id) => !done.has(id))
 
   return (
@@ -123,20 +129,30 @@ export function CodeLab() {
               <label className="col-span-2">{t('runOn')}
                 <select value={backend} onChange={(e) => setBackend(e.target.value as 'sim' | 'ibm')} className="mt-1 block w-full rounded border border-border px-2 py-1">
                   <option value="sim">{t('simulator')}</option>
-                  <option value="ibm" disabled={!hardware}>{t('ibm')}{hardware ? t('ibmQueue') : t('ibmOff')}</option>
+                  <option value="ibm">{t('ibm')}{t('ibmQueue')}</option>
                 </select>
               </label>
             </div>
-            <button onClick={run} disabled={busy} className="mt-4 h-11 w-full rounded-md bg-slate-900 font-heading text-sm font-bold text-white disabled:opacity-50">
+            {backend === 'ibm' && (
+              <div className="mt-3 space-y-2">
+                <p className="rounded border border-orange-200 bg-orange-50 p-2 text-xs text-orange-900">{t('hwWarn')}</p>
+                <label className="block font-mono text-sm">{t('apiKey')}
+                  <input type="password" autoComplete="off" spellCheck={false} value={apiKey} onChange={(e) => setApiKey(e.target.value)}
+                    placeholder={serverKey ? t('apiKeyServer') : t('apiKeyPlace')} className="mt-1 block w-full rounded border border-border px-2 py-1" />
+                </label>
+                <p className="text-xs text-slate-500">{t('apiKeyHelp')}</p>
+              </div>
+            )}
+            <button onClick={run} disabled={busy || (backend === 'ibm' && !serverKey && apiKey.trim().length < 20)} className="mt-4 h-11 w-full rounded-md bg-slate-900 font-heading text-sm font-bold text-white disabled:opacity-50">
               {busy ? (job?.phase ? msg(job.phase) : t('running')) : t('runBtn')}
             </button>
             {error && <p role="alert" className="mt-3 whitespace-pre-wrap rounded border border-red-300 bg-red-50 p-3 font-mono text-sm text-red-800">{showError(error)}</p>}
           </section>
 
           <section aria-live="polite" className="min-w-0 space-y-4">
-            {job?.error && <p role="alert" className="whitespace-pre-wrap rounded border border-red-300 bg-red-50 p-3 font-mono text-sm text-red-800">{job.error}</p>}
+            {job?.error && <p role="alert" className="whitespace-pre-wrap rounded border border-red-300 bg-red-50 p-3 font-mono text-sm text-red-800">{jobError(job.error)}</p>}
             {!job && !error && <p className="rounded-lg border border-dashed border-border p-8 text-center text-slate-500">{t('empty')}</p>}
-            {job?.stages.map((s) => <StageCard key={s.id} s={s} />)}
+            {job?.stages.map((s) => (s.id === 'report' ? <ReportCard key="report" r={s as Report} /> : <StageCard key={s.id} s={s as Stage} />))}
           </section>
         </div>
       </main>
@@ -187,17 +203,38 @@ function StageCard({ s }: { s: Stage }) {
             {s.histogram.map((h) => (
               <li key={h.key} className="flex items-center gap-2">
                 <span className="w-14">{h.key}</span>
-                <div className="flex-1 space-y-0.5" role="img" aria-label={`${h.key}: ${t('ideal')} ${(h.ideal * 100).toFixed(1)}%, ${t('measured')} ${(h.measured * 100).toFixed(1)}%`}>
+                <div className="flex-1 space-y-0.5" role="img" aria-label={`${h.key}: ${t('ideal')} ${(h.ideal * 100).toFixed(1)}%, ${t('measured')} ${(h.measured * 100).toFixed(1)}%${h.model !== undefined ? `, ${t('modelBars')} ${(h.model * 100).toFixed(1)}%` : ''}`}>
                   <div className="h-2 rounded bg-slate-900" style={{ width: `${h.ideal * 100}%` }} />
                   <div className="h-2 rounded bg-accent" style={{ width: `${h.measured * 100}%` }} />
+                  {h.model !== undefined && <div className="h-2 rounded bg-sky-600" style={{ width: `${h.model * 100}%` }} />}
                 </div>
-                <span className="w-24 text-right">{(h.ideal * 100).toFixed(1)} / {(h.measured * 100).toFixed(1)}%</span>
+                <span className="w-40 whitespace-nowrap text-right">{(h.ideal * 100).toFixed(1)} / {(h.measured * 100).toFixed(1)}{h.model !== undefined ? ` / ${(h.model * 100).toFixed(1)}` : ''}%</span>
               </li>
             ))}
           </ul>
-          <p className="mt-2 font-mono text-[12px]"><span className="text-slate-900">■</span> {t('ideal')} · <span className="text-accent">■</span> {t('measured')} · {t('tvdLabel')} <b>{s.tvd}</b></p>
+          <p className="mt-2 font-mono text-[12px]"><span className="text-slate-900">■</span> {t('ideal')} · <span className="text-accent">■</span> {s.tvdModel !== undefined ? t('hwBars') : t('measured')}{s.tvdModel !== undefined && <> · <span className="text-sky-600">■</span> {t('modelBars')}</>} · {s.tvdModel !== undefined ? t('tvdHw') : t('tvdLabel')} <b>{s.tvd}</b>{s.tvdModel !== undefined && <> · {t('tvdModel')} <b>{s.tvdModel}</b></>}</p>
         </div>
       )}
+    </article>
+  )
+}
+
+function ReportCard({ r }: { r: Report }) {
+  const t = useT()
+  const hw = Number(r.tvd_hardware), model = Number(r.tvd_noise_model)
+  const download = () => {
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' }))
+    a.download = `quantumlab-${r.backend}-${r.job}.json`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+  return (
+    <article className="min-w-0 rounded-lg border border-accent p-5">
+      <h2 className="font-heading text-xl font-bold">{t('report')}</h2>
+      <p className="mt-2 font-mono text-sm">{r.backend} · job {r.job}</p>
+      {!Number.isNaN(model) && <p className="mt-2 text-sm">{t('hwRead', { hw, model, rel: Math.abs(hw - model) <= 0.015 ? 'same' : hw < model ? 'closer' : 'further' })}</p>}
+      <button onClick={download} className="mt-3 h-10 rounded-md border border-slate-900 px-4 font-heading text-sm font-bold hover:bg-slate-900 hover:text-white">{t('download')}</button>
     </article>
   )
 }

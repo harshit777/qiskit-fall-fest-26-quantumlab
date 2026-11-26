@@ -10,6 +10,22 @@ export type Dict = Record<string, string | Fn>
 
 // Keys that the Python server sends (pipeline.py "k" fields) are the ones without a UI-only meaning.
 export const en: Dict = {
+  // hardware run
+  apiKey: 'IBM Quantum API key', apiKeyHelp: 'Used for this run only. It is sent to our server over HTTPS, never saved or logged. Get one free at quantum.cloud.ibm.com.',
+  apiKeyServer: 'This server has its own IBM key, so you can leave this empty.', apiKeyPlace: 'paste your key',
+  hwWarn: 'Real hardware: your job waits in IBM\'s queue (often minutes) and uses your IBM free-tier time. You can leave this page open.',
+  ibmOn: ' (needs your IBM key)',
+  report: 'Hardware report', download: 'Download results (JSON)', hwBars: 'real hardware', modelBars: 'noise-model simulation',
+  tvdHw: 'distance of hardware from ideal', tvdModel: 'distance of noise model from ideal',
+  hwRead: ((p) => `TVD from the ideal answer: hardware ${p.hw}, noise-model simulation ${p.model}. ${p.rel === 'same' ? 'About the same, so the noise model describes this device well for this circuit.' : p.rel === 'closer' ? 'Hardware did better than the model predicted (error suppression was on).' : 'Real devices have errors the model does not capture, such as crosstalk and drift.'}`) as Fn,
+  // errors from the server
+  needKey: 'Paste your IBM Quantum API key to run on real hardware.', badKey: 'IBM did not accept this API key. Check it and try again.',
+  noBackend: 'No IBM quantum computer is available for this circuit right now. Try again later.',
+  hwFailed: ((p) => `The IBM job ${p.j} failed or was cancelled.`) as Fn,
+  hwTimeout: ((p) => `The IBM job ${p.j} did not finish within ${p.m} minutes and was cancelled.`) as Fn,
+  busy: 'The server is busy with other runs. Try again in a minute.', busyHw: 'A hardware job is already running on this server. Try again in a few minutes.',
+  tooLarge: 'The request is too large.', invalid: 'Invalid request: code up to 6000 characters, level 0-3, shots 1-4096.',
+  'ex.lesson': 'Lesson 2 circuit: Bell pair (good for a hardware run)',
   // shared chrome
   learn: './learn', code: './code', sections: 'Sections', language: 'Language',
   // learn tab
@@ -57,12 +73,26 @@ export const en: Dict = {
   shotsChip: ((p) => `${p.v} shots`) as Fn,
   dd: 'dynamical decoupling on', twirl: 'Pauli twirling on',
   connect: 'connecting to IBM Quantum...', transpiling: 'transpiling...', simulating: 'running noisy simulation...',
-  queued: ((p) => `queued on ${p.b} (IBM job ${p.j}), waiting for results...`) as Fn,
+  queued: ((p) => `queued on ${p.b} (IBM job ${p.j}), waiting for results... · ${p.s} · ${p.t}s`) as Fn,
   // example names
   'ex.bell': 'Bell pair as a reusable gate (compose)', 'ex.redundant': 'Redundant gates (watch the optimizer)', 'ex.ghz': 'GHZ state with a loop',
 }
 
 export const hi: Dict = {
+  apiKey: 'IBM Quantum API कुंजी', apiKeyHelp: 'सिर्फ़ इसी रन के लिए इस्तेमाल होती है। यह HTTPS से हमारे सर्वर तक जाती है, कभी सहेजी या लॉग नहीं की जाती। quantum.cloud.ibm.com पर मुफ़्त मिलती है।',
+  apiKeyServer: 'इस सर्वर के पास अपनी IBM कुंजी है, इसलिए आप इसे खाली छोड़ सकते हैं।', apiKeyPlace: 'अपनी कुंजी चिपकाइए',
+  hwWarn: 'असली हार्डवेयर: आपका जॉब IBM की कतार में इंतज़ार करता है (अक्सर कुछ मिनट) और आपका IBM फ़्री-टियर समय इस्तेमाल करता है। आप यह पेज खुला छोड़ सकते हैं।',
+  ibmOn: ' (आपकी IBM कुंजी चाहिए)',
+  report: 'हार्डवेयर रिपोर्ट', download: 'नतीजे डाउनलोड करें (JSON)', hwBars: 'असली हार्डवेयर', modelBars: 'नॉइज़-मॉडल सिमुलेशन',
+  tvdHw: 'आदर्श से हार्डवेयर की दूरी', tvdModel: 'आदर्श से नॉइज़ मॉडल की दूरी',
+  hwRead: ((p) => `आदर्श उत्तर से TVD: हार्डवेयर ${p.hw}, नॉइज़-मॉडल सिमुलेशन ${p.model}। ${p.rel === 'same' ? 'लगभग बराबर, यानी इस सर्किट के लिए नॉइज़ मॉडल इस डिवाइस को अच्छी तरह दर्शाता है।' : p.rel === 'closer' ? 'हार्डवेयर ने मॉडल के अनुमान से बेहतर किया (त्रुटि-दमन चालू था)।' : 'असली डिवाइस में ऐसी त्रुटियाँ होती हैं जो मॉडल नहीं पकड़ता, जैसे क्रॉसटॉक और ड्रिफ़्ट।'}`) as Fn,
+  needKey: 'असली हार्डवेयर पर चलाने के लिए अपनी IBM Quantum API कुंजी चिपकाइए।', badKey: 'IBM ने यह API कुंजी स्वीकार नहीं की। जाँचकर फिर कोशिश कीजिए।',
+  noBackend: 'इस समय इस सर्किट के लिए कोई IBM क्वांटम कंप्यूटर उपलब्ध नहीं है। बाद में कोशिश कीजिए।',
+  hwFailed: ((p) => `IBM जॉब ${p.j} विफल हो गया या रद्द हुआ।`) as Fn,
+  hwTimeout: ((p) => `IBM जॉब ${p.j} ${p.m} मिनट में पूरा नहीं हुआ और रद्द कर दिया गया।`) as Fn,
+  busy: 'सर्वर अभी दूसरे रन में व्यस्त है। एक मिनट बाद कोशिश कीजिए।', busyHw: 'इस सर्वर पर एक हार्डवेयर जॉब पहले से चल रहा है। कुछ मिनट बाद कोशिश कीजिए।',
+  tooLarge: 'अनुरोध बहुत बड़ा है।', invalid: 'अमान्य अनुरोध: कोड 6000 अक्षर तक, स्तर 0-3, शॉट्स 1-4096।',
+  'ex.lesson': 'पाठ 2 का सर्किट: बेल जोड़ी (हार्डवेयर रन के लिए अच्छा)',
   learn: './सीखें', code: './कोड', sections: 'अनुभाग', language: 'भाषा',
   lessons: 'पाठ', circuit: 'सर्किट', add: 'क्यूबिट पर गेट जोड़ें', reset: 'पाठ का मूल सर्किट',
   remove: 'गेट हटाने के लिए उस पर क्लिक करें', hist: 'माप की संभावनाएँ', walk: 'आज़माइए', quiz: 'प्रश्नोत्तरी', score: 'स्कोर',
@@ -105,11 +135,25 @@ export const hi: Dict = {
   shotsChip: ((p) => `${p.v} शॉट्स`) as Fn,
   dd: 'डायनामिकल डीकपलिंग चालू', twirl: 'पॉली ट्विर्लिंग चालू',
   connect: 'IBM क्वांटम से जुड़ रहे हैं...', transpiling: 'ट्रांसपाइल हो रहा है...', simulating: 'नॉइज़ सिमुलेशन चल रहा है...',
-  queued: ((p) => `${p.b} पर कतार में (IBM जॉब ${p.j}), नतीजों का इंतज़ार...`) as Fn,
+  queued: ((p) => `${p.b} पर कतार में (IBM जॉब ${p.j}), नतीजों का इंतज़ार... · ${p.s} · ${p.t}s`) as Fn,
   'ex.bell': 'बेल जोड़ी को दोबारा इस्तेमाल होने वाले गेट के रूप में (compose)', 'ex.redundant': 'फ़ालतू गेट (ऑप्टिमाइज़र को देखिए)', 'ex.ghz': 'लूप से GHZ अवस्था',
 }
 
 export const kn: Dict = {
+  apiKey: 'IBM Quantum API ಕೀ', apiKeyHelp: 'ಈ ರನ್‌ಗೆ ಮಾತ್ರ ಬಳಕೆಯಾಗುತ್ತದೆ. ಇದು HTTPS ಮೂಲಕ ನಮ್ಮ ಸರ್ವರ್‌ಗೆ ಹೋಗುತ್ತದೆ, ಎಂದಿಗೂ ಉಳಿಸಲಾಗುವುದಿಲ್ಲ ಅಥವಾ ಲಾಗ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ. quantum.cloud.ibm.com ನಲ್ಲಿ ಉಚಿತವಾಗಿ ಸಿಗುತ್ತದೆ.',
+  apiKeyServer: 'ಈ ಸರ್ವರ್‌ಗೆ ತನ್ನದೇ ಆದ IBM ಕೀ ಇದೆ, ಆದ್ದರಿಂದ ಇದನ್ನು ಖಾಲಿ ಬಿಡಬಹುದು.', apiKeyPlace: 'ನಿಮ್ಮ ಕೀ ಅಂಟಿಸಿ',
+  hwWarn: 'ನಿಜವಾದ ಹಾರ್ಡ್‌ವೇರ್: ನಿಮ್ಮ ಜಾಬ್ IBM ನ ಸರತಿಯಲ್ಲಿ ಕಾಯುತ್ತದೆ (ಹೆಚ್ಚಾಗಿ ಕೆಲವು ನಿಮಿಷ) ಮತ್ತು ನಿಮ್ಮ IBM ಉಚಿತ-ಹಂತದ ಸಮಯವನ್ನು ಬಳಸುತ್ತದೆ. ಈ ಪುಟವನ್ನು ತೆರೆದಿಡಬಹುದು.',
+  ibmOn: ' (ನಿಮ್ಮ IBM ಕೀ ಬೇಕು)',
+  report: 'ಹಾರ್ಡ್‌ವೇರ್ ವರದಿ', download: 'ಫಲಿತಾಂಶಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ (JSON)', hwBars: 'ನಿಜವಾದ ಹಾರ್ಡ್‌ವೇರ್', modelBars: 'ನಾಯ್ಸ್-ಮಾಡೆಲ್ ಸಿಮ್ಯುಲೇಶನ್',
+  tvdHw: 'ಆದರ್ಶದಿಂದ ಹಾರ್ಡ್‌ವೇರ್‌ನ ದೂರ', tvdModel: 'ಆದರ್ಶದಿಂದ ನಾಯ್ಸ್ ಮಾಡೆಲ್‌ನ ದೂರ',
+  hwRead: ((p) => `ಆದರ್ಶ ಉತ್ತರದಿಂದ TVD: ಹಾರ್ಡ್‌ವೇರ್ ${p.hw}, ನಾಯ್ಸ್-ಮಾಡೆಲ್ ಸಿಮ್ಯುಲೇಶನ್ ${p.model}. ${p.rel === 'same' ? 'ಸುಮಾರು ಒಂದೇ, ಅಂದರೆ ಈ ಸರ್ಕ್ಯೂಟ್‌ಗೆ ನಾಯ್ಸ್ ಮಾಡೆಲ್ ಈ ಸಾಧನವನ್ನು ಚೆನ್ನಾಗಿ ವಿವರಿಸುತ್ತದೆ.' : p.rel === 'closer' ? 'ಹಾರ್ಡ್‌ವೇರ್ ಮಾದರಿಯ ಅಂದಾಜಿಗಿಂತ ಉತ್ತಮವಾಗಿ ಕೆಲಸ ಮಾಡಿತು (ದೋಷ ನಿಗ್ರಹ ಆನ್ ಆಗಿತ್ತು).' : 'ನಿಜವಾದ ಸಾಧನಗಳಲ್ಲಿ ಮಾದರಿ ಸೆರೆಹಿಡಿಯದ ದೋಷಗಳಿರುತ್ತವೆ, ಉದಾಹರಣೆಗೆ ಕ್ರಾಸ್‌ಟಾಕ್ ಮತ್ತು ಡ್ರಿಫ್ಟ್.'}`) as Fn,
+  needKey: 'ನಿಜವಾದ ಹಾರ್ಡ್‌ವೇರ್‌ನಲ್ಲಿ ಚಲಾಯಿಸಲು ನಿಮ್ಮ IBM Quantum API ಕೀ ಅಂಟಿಸಿ.', badKey: 'IBM ಈ API ಕೀ ಅನ್ನು ಒಪ್ಪಲಿಲ್ಲ. ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+  noBackend: 'ಈ ಸರ್ಕ್ಯೂಟ್‌ಗೆ ಈಗ ಯಾವುದೇ IBM ಕ್ವಾಂಟಮ್ ಕಂಪ್ಯೂಟರ್ ಲಭ್ಯವಿಲ್ಲ. ನಂತರ ಪ್ರಯತ್ನಿಸಿ.',
+  hwFailed: ((p) => `IBM ಜಾಬ್ ${p.j} ವಿಫಲವಾಯಿತು ಅಥವಾ ರದ್ದಾಯಿತು.`) as Fn,
+  hwTimeout: ((p) => `IBM ಜಾಬ್ ${p.j} ${p.m} ನಿಮಿಷಗಳಲ್ಲಿ ಮುಗಿಯಲಿಲ್ಲ ಮತ್ತು ರದ್ದುಮಾಡಲಾಯಿತು.`) as Fn,
+  busy: 'ಸರ್ವರ್ ಈಗ ಇತರ ರನ್‌ಗಳಲ್ಲಿ ನಿರತವಾಗಿದೆ. ಒಂದು ನಿಮಿಷದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.', busyHw: 'ಈ ಸರ್ವರ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಒಂದು ಹಾರ್ಡ್‌ವೇರ್ ಜಾಬ್ ಚಲಿಸುತ್ತಿದೆ. ಕೆಲವು ನಿಮಿಷಗಳ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.',
+  tooLarge: 'ವಿನಂತಿ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ.', invalid: 'ಅಮಾನ್ಯ ವಿನಂತಿ: ಕೋಡ್ 6000 ಅಕ್ಷರಗಳವರೆಗೆ, ಮಟ್ಟ 0-3, ಶಾಟ್‌ಗಳು 1-4096.',
+  'ex.lesson': 'ಪಾಠ 2 ರ ಸರ್ಕ್ಯೂಟ್: ಬೆಲ್ ಜೋಡಿ (ಹಾರ್ಡ್‌ವೇರ್ ರನ್‌ಗೆ ಒಳ್ಳೆಯದು)',
   learn: './ಕಲಿಯಿರಿ', code: './ಕೋಡ್', sections: 'ವಿಭಾಗಗಳು', language: 'ಭಾಷೆ',
   lessons: 'ಪಾಠಗಳು', circuit: 'ಸರ್ಕ್ಯೂಟ್', add: 'ಕ್ಯೂಬಿಟ್‌ಗೆ ಗೇಟ್ ಸೇರಿಸಿ', reset: 'ಪಾಠದ ಮೂಲ ಸರ್ಕ್ಯೂಟ್',
   remove: 'ಗೇಟ್ ತೆಗೆಯಲು ಅದರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ', hist: 'ಅಳತೆಯ ಸಂಭವನೀಯತೆಗಳು', walk: 'ಇದನ್ನು ಪ್ರಯತ್ನಿಸಿ', quiz: 'ರಸಪ್ರಶ್ನೆ', score: 'ಅಂಕ',
@@ -152,7 +196,7 @@ export const kn: Dict = {
   shotsChip: ((p) => `${p.v} ಶಾಟ್‌ಗಳು`) as Fn,
   dd: 'ಡೈನಾಮಿಕಲ್ ಡಿಕಪ್ಲಿಂಗ್ ಆನ್', twirl: 'ಪೌಲಿ ಟ್ವಿರ್ಲಿಂಗ್ ಆನ್',
   connect: 'IBM ಕ್ವಾಂಟಮ್‌ಗೆ ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ...', transpiling: 'ಟ್ರಾನ್ಸ್‌ಪೈಲ್ ಆಗುತ್ತಿದೆ...', simulating: 'ನಾಯ್ಸ್ ಸಿಮ್ಯುಲೇಶನ್ ಚಲಿಸುತ್ತಿದೆ...',
-  queued: ((p) => `${p.b} ನಲ್ಲಿ ಸರತಿಯಲ್ಲಿ (IBM ಜಾಬ್ ${p.j}), ಫಲಿತಾಂಶಕ್ಕಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ...`) as Fn,
+  queued: ((p) => `${p.b} ನಲ್ಲಿ ಸರತಿಯಲ್ಲಿ (IBM ಜಾಬ್ ${p.j}), ಫಲಿತಾಂಶಕ್ಕಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ... · ${p.s} · ${p.t}s`) as Fn,
   'ex.bell': 'ಮರುಬಳಕೆಯ ಗೇಟ್ ಆಗಿ ಬೆಲ್ ಜೋಡಿ (compose)', 'ex.redundant': 'ಅನಗತ್ಯ ಗೇಟ್‌ಗಳು (ಆಪ್ಟಿಮೈಜರ್ ನೋಡಿ)', 'ex.ghz': 'ಲೂಪ್‌ನೊಂದಿಗೆ GHZ ಸ್ಥಿತಿ',
 }
 

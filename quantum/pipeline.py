@@ -3,7 +3,7 @@ build & compose -> decompose -> optimize -> transpile -> execute -> post-process
 Each stage is emitted as a JSON-able dict so the web UI can show it as soon as it is done.
 Text is language-neutral: stages carry ids, params and {"k": key, "v": value} chips/notes that the web UI
 translates (en/hi/kn). The English `title`/`why` fields are kept as a fallback for other clients."""
-import os
+import time
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit import Gate, Instruction
@@ -17,6 +17,30 @@ from sandbox import build
 
 BASIS = ["cz", "id", "rz", "sx", "x"]  # native gates of IBM Heron-class devices
 SEED = 7
+HW_TIMEOUT = 20 * 60  # seconds to wait for a real device (queue + run) before giving up
+
+
+class PipelineError(Exception):
+    """Failure with a translatable message: .key indexes the web dictionary, .params fill it in."""
+
+    def __init__(self, key, **params):
+        super().__init__(key)
+        self.key, self.params = key, params
+
+
+def open_ibm(api_key, min_qubits):
+    """Connect to IBM Quantum with the caller's key and pick the least busy real device.
+    The key lives only in this call frame. It is never stored, logged or echoed."""
+    from qiskit_ibm_runtime import QiskitRuntimeService
+
+    try:
+        svc = QiskitRuntimeService(channel="ibm_quantum_platform", token=api_key)
+    except Exception:
+        raise PipelineError("badKey")
+    try:
+        return svc.least_busy(operational=True, simulator=False, min_num_qubits=min_qubits)
+    except Exception:
+        raise PipelineError("noBackend")
 
 
 def sim_backend():
@@ -36,7 +60,9 @@ def counts_of(result):
     return next(iter(result.data.values())).get_counts()  # first (usually only) classical register
 
 
-def run(code, level, shots, kind, emit, status):
+def run(code, level, shots, kind, emit, status, api_key=None, backend=None):
+    """kind "sim": noisy simulator of a generic 5-qubit device.
+    kind "ibm": real hardware via Runtime SamplerV2 (`backend` may be injected for tests)."""
     qc = build(code)
     auto = qc.count_ops().get("measure", 0) == 0
     if auto:
@@ -79,9 +105,8 @@ def run(code, level, shots, kind, emit, status):
     # 4. Transpile: map the circuit onto a concrete device
     status({"k": "connect"} if kind == "ibm" else {"k": "transpiling"})
     if kind == "ibm":
-        from qiskit_ibm_runtime import QiskitRuntimeService
-        svc = QiskitRuntimeService(channel="ibm_quantum_platform", token=os.environ["QUANTUM_API_KEY"])
-        backend = svc.least_busy(operational=True, simulator=False, min_num_qubits=qc.num_qubits)
+        if backend is None:
+            backend = open_ibm(api_key, qc.num_qubits)
     else:
         backend = sim_backend()
     pm = generate_preset_pass_manager(backend=backend, optimization_level=level, seed_transpiler=SEED)
@@ -99,16 +124,35 @@ def run(code, level, shots, kind, emit, status):
         "note": {"k": "delta", "v": {"d0": before["depth"], "d1": after["depth"], "s0": before["size"], "s1": after["size"], "q0": before["twoq"], "q1": after["twoq"]}},
     })
 
-    # 5. Execute: noisy simulator of the device, or real hardware through the Runtime Sampler
+    # 5. Execute: real hardware through the Runtime Sampler, or a noisy simulator of the device
+    noisy = None
     if kind == "ibm":
         from qiskit_ibm_runtime import SamplerV2
         sampler = SamplerV2(mode=backend)
-        sampler.options.dynamical_decoupling.enable = True
-        sampler.options.twirling.enable_gates = True
+        sampler.options.dynamical_decoupling.enable = True  # echo pulses on idle qubits
+        sampler.options.twirling.enable_gates = True  # Pauli twirling averages coherent error into plain noise
         job = sampler.run([isa], shots=shots)
-        status({"k": "queued", "v": {"b": backend.name, "j": job.job_id()}})
-        counts, where = counts_of(job.result()[0]), {"k": "hw", "v": {"b": backend.name, "j": job.job_id()}}
+        jid = job.job_id()
+        t0 = time.time()
+        while True:
+            st = str(getattr(job.status(), "name", job.status())).upper()
+            if st == "DONE":
+                break
+            if st in ("ERROR", "CANCELLED"):
+                raise PipelineError("hwFailed", j=jid)
+            if time.time() - t0 > HW_TIMEOUT:
+                try:
+                    job.cancel()
+                except Exception:
+                    pass
+                raise PipelineError("hwTimeout", j=jid, m=HW_TIMEOUT // 60)
+            status({"k": "queued", "v": {"b": backend.name, "j": jid, "s": st, "t": int(time.time() - t0)}})
+            time.sleep(3)
+        counts = counts_of(job.result()[0])
+        where = {"k": "hw", "v": {"b": backend.name, "j": jid}}
         chips = [{"k": "dd"}, {"k": "twirl"}]
+        status({"k": "simulating"})
+        noisy = AerSimulator.from_backend(backend).run(isa, shots=shots).result().get_counts()  # same device noise, simulated
     else:
         status({"k": "simulating"})
         counts = AerSimulator.from_backend(backend).run(isa, shots=shots).result().get_counts()
@@ -117,16 +161,27 @@ def run(code, level, shots, kind, emit, status):
         "id": "execute", "title": "5 · Execute",
         "why": "The Sampler runs the circuit many times (shots) and counts each measured bit string.",
         "chips": [where, {"k": "shots", "v": shots}] + chips,
+        "hardware": kind == "ibm",
     })
 
-    # 6. Post-process: compare what we measured with the ideal noiseless answer
+    # 6. Post-process: compare what we measured with the ideal noiseless answer (and, on hardware, the noise model)
     ideal = counts_of(StatevectorSampler(default_shots=20000, seed=1).run([qc]).result()[0])
-    keys = set(counts) | set(ideal)
-    p = {k: (ideal.get(k, 0) / 20000, counts.get(k, 0) / shots) for k in keys}
+    keys = set(counts) | set(ideal) | set(noisy or {})
+    row = lambda k: (ideal.get(k, 0) / 20000, counts.get(k, 0) / shots, (noisy or {}).get(k, 0) / shots)
+    p = {k: row(k) for k in keys}
     top = sorted(p, key=lambda k: -max(p[k]))[:16]
-    tvd = 0.5 * sum(abs(a - b) for a, b in p.values())
-    emit({
+    tvd = lambda i: round(0.5 * sum(abs(v[0] - v[i]) for v in p.values()), 4)
+    out = {
         "id": "post", "title": "6 · Post-process",
         "why": "Raw counts become probabilities. The total variation distance says how far noise pushed the measured distribution from the ideal one (0 = identical, 1 = completely different).",
-        "histogram": [{"key": k, "ideal": p[k][0], "measured": p[k][1]} for k in sorted(top)], "tvd": round(tvd, 4),
-    })
+        "histogram": [{"key": k, "ideal": p[k][0], "measured": p[k][1], **({"model": p[k][2]} if noisy else {})} for k in sorted(top)],
+        "tvd": tvd(1),
+    }
+    if noisy:
+        out["tvdModel"] = tvd(2)
+    emit(out)
+    if kind == "ibm":
+        emit({"id": "report", "backend": backend.name, "job": jid, "shots": shots, "level": level, "code": code,
+              "ideal_counts": {k: round(v * 20000) for k, v in ideal.items()}, "hardware_counts": dict(counts),
+              "noise_model_counts": dict(noisy) if noisy else None,
+              "logical": stats(qc), "transpiled": stats(isa), "tvd_hardware": tvd(1), "tvd_noise_model": tvd(2) if noisy else None})
